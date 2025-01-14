@@ -1,16 +1,9 @@
-name: Update Temperature
-
-on:
-  schedule:
-    - cron: "*/1 * * * *" # Kör varje minut
-  workflow_dispatch: # Manuell körning
-
 jobs:
   update:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out repository
+    - name: Checkout repository
       uses: actions/checkout@v3
 
     - name: Set up Python
@@ -22,5 +15,15 @@ jobs:
       run: |
         pip install requests beautifulsoup4
 
-    - name: Run update script
+    - name: Run Python script
       run: python update_temperature.py
+
+    - name: Push changes
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |
+        git config --global user.name "your-username"
+        git config --global user.email "your-email@example.com"
+        git add index.html
+        git commit -m "Update index.html"
+        git push
