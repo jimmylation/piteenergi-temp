@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+import subprocess
 
 url = "https://temperatur-lindbacksstadion.onrender.com/"
 data_file = "temperature_data.json"
@@ -17,32 +18,25 @@ def write_new_data(snow_temp, air_temp):
         json.dump({"snow_temp": snow_temp, "air_temp": air_temp}, file)
 
 response = requests.get(url)
-
-# Kolla om hämtningen lyckades
 if response.status_code == 200:
     print("Data hämtades framgångsrikt!")
     soup = BeautifulSoup(response.text, 'html.parser')
     
-    # Hämta uppdaterad tid och temperaturer
     updated_time = soup.find(id="updated-time").text
     snow_temp = int(soup.find(id="snow-temp").text.replace("°", ""))
     air_temp = int(soup.find(id="air-temp").text.replace("°", ""))
-    
-    # Skriv ut för att kontrollera
+
     print(f"Uppdaterad tid: {updated_time}")
     print(f"Snötemp: {snow_temp}")
     print(f"Lufttemp: {air_temp}")
     
-    # Hämta tidigare data
     previous_data = read_previous_data()
     previous_snow_temp = previous_data["snow_temp"]
     previous_air_temp = previous_data["air_temp"]
     
-    # Bestäm trend
     snow_trend = "neutral" if previous_snow_temp is None else "up" if snow_temp > previous_snow_temp else "down"
     air_trend = "neutral" if previous_air_temp is None else "up" if air_temp > previous_air_temp else "down"
     
-    # Skapa HTML-innehåll
     html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -70,5 +64,10 @@ if response.status_code == 200:
 
     write_new_data(snow_temp, air_temp)
     print("HTML och data uppdaterade.")
+
+    # Push till GitHub
+    subprocess.run(["git", "add", "index.html"])
+    subprocess.run(["git", "commit", "-m", "Uppdaterad index.html"])
+    subprocess.run(["git", "push"])
 else:
     print(f"Kunde inte hämta data: {response.status_code}")
