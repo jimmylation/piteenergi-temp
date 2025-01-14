@@ -1,3 +1,10 @@
+name: Update Temperature
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"  # Kör varje femte minut
+  workflow_dispatch:  # Manuell körning
+
 jobs:
   update:
     runs-on: ubuntu-latest
