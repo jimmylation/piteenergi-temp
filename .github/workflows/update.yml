@@ -2,7 +2,7 @@ name: Update Temperature
 
 on:
   schedule:
-    - cron: "*/5 * * * *" # Kör var femte minut
+    - cron: "*/1 * * * *" # Kör var femte minut
   workflow_dispatch: # Manuell körning
 
 jobs:
