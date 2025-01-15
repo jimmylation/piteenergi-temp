@@ -4,69 +4,31 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Välkommen till Lindbäcksstadion!</title>
+        <title>Temperaturtrender vid Lindbäcksstadion</title>
         <style>
-            body {
-                margin: 0;
-                padding: 0;
-                height: 100vh;
-                width: 100vw;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                align-items: center;
-                background: url('background.jpg') no-repeat center center fixed;
-                background-size: cover;
-                font-family: 'Arial', sans-serif;
-                color: #ffffff;
-                text-align: center;
-            }
-            .header {
-                margin-top: 18px;
-                font-size: 3rem;
-                font-weight: bold;
-                text-shadow: 2px 2px 4px #000000;
-            }
-            .temperature-container {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-            }
+            .trend-up { color: red; }
+            .trend-down { color: blue; }
             .temperature {
-                font-size: 10rem;
+                font-size: 14rem; 
                 font-weight: bold;
-                color: #6699FF;
-                text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
+                text-shadow: 
+                1px 1px 2px #000000,  
+                2px 2px 4px #000000,  
+                -1px -1px 2px #000000;
                 margin: 0;
             }
-            .temperature span {
-                display: block;
-            }
-            .source {
-                font-size: 1rem;
-                margin-bottom: 20px;
-                text-shadow: 1px 1px 3px #000000;
-                background: rgba(0, 0, 0, 0.5);
-                padding: 10px 20px;
-                border-radius: 10px;
-            }
-            .source a {
-                text-decoration: none;
-                color: #ffffff;
-                font-weight: bold;
-            }
+            .snow-temp { color: #8A2BE2; }
+            .air-temp { color: #FF0000; }
         </style>
     </head>
     <body>
         <div class="header">Välkommen till Lindbäcksstadion!</div>
         <div class="temperature-container">
             <div id="temperature" class="temperature">
-                <span>Snö: 0°</span>
-                <span>Luft: 4°</span>
+                <span class="snow snow-temp">Snö: 0°C</span>
+                <span class="air air-temp">Luft: 4°C</span>
             </div>
-            <div id="clock" class="clock">Senast uppdaterad: 22:48</div>
+            <div id="clock" class="clock">Senast uppdaterad: 23:08</div>
         </div>
         <div class="source">
             Kontrolldata från Temperatur.nu: 
