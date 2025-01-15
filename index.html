@@ -37,9 +37,13 @@
             }
             .snow-temp {
                 color: #8A2BE2;
+                display: inline-block;
+                margin-bottom: 10px;
             }
             .air-temp {
                 color: #FF0000;
+                display: inline-block;
+                margin-top: 10px;
             }
             .clock {
                 font-size: 14rem;
@@ -72,17 +76,15 @@
                 color: #4a88b8;
             }
             .temperature {
-                animation: fadeTemp 5s linear infinite;
+                animation: fadeTemp 5s forwards;
             }
             .clock-animation {
-                animation: fadeClock 2s linear infinite;
+                animation: fadeClock 3s forwards;
+                animation-delay: 5s; /* Klockan syns efter 5 sek */
             }
             @keyframes fadeTemp {
                 0% {
                     opacity: 1;
-                }
-                50% {
-                    opacity: 0;
                 }
                 100% {
                     opacity: 1;
@@ -96,7 +98,7 @@
                     opacity: 1;
                 }
                 100% {
-                    opacity: 0;
+                    opacity: 1;
                 }
             }
         </style>
@@ -109,7 +111,7 @@
                 <br>
                 <span class="air air-temp">Luft: 4°C</span>
             </div>
-            <div id="clock" class="clock clock-animation">Senast uppdaterad: 23:18</div>
+            <div id="clock" class="clock clock-animation">Senast uppdaterad: 23:28</div>
         </div>
         <div class="source">
             Kontrolldata från Temperatur.nu: 
