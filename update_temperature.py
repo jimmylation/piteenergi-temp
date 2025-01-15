@@ -76,7 +76,7 @@ if response.status_code == 200:
                 text-align: center;
             }}
             .header {{
-                margin-top: 18px;
+                margin-top: 30px;  /* Större avstånd mellan header och temperaturer */
                 font-size: 3rem;
                 font-weight: bold;
                 text-shadow: 2px 2px 4px #000000;
