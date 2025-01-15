@@ -33,16 +33,22 @@
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
+                font-size: 7.5rem; /* 15rem för båda */
             }
-            .temperature {
-                font-size: 5rem;
+            .snow-temp {
+                color: #8A2BE2;
+            }
+            .air-temp {
+                color: #FF0000;
+            }
+            .clock {
+                font-size: 14rem;
+                color: #ffffff;
+                margin-top: 10px;
                 font-weight: bold;
-                color: #000099;
-                text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
-                margin: 0;
+                text-shadow: 1px 1px 3px #000000;
+                display: none;
             }
-            .snow-temp { color: #8A2BE2; }
-            .air-temp { color: #FF0000; }
             .error {
                 font-size: 1.5rem;
                 color: #FF6347;
@@ -65,12 +71,33 @@
             a:hover {
                 color: #4a88b8;
             }
-            .clock {
-                font-size: 1.2rem;
-                color: #FFFFFF;
-                margin-top: 10px;
-                font-weight: bold;
-                text-shadow: 1px 1px 3px #000000;
+            .temperature {
+                animation: fadeTemp 5s linear infinite;
+            }
+            .clock-animation {
+                animation: fadeClock 2s linear infinite;
+            }
+            @keyframes fadeTemp {
+                0% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity: 1;
+                }
+            }
+            @keyframes fadeClock {
+                0% {
+                    opacity: 0;
+                }
+                50% {
+                    opacity: 1;
+                }
+                100% {
+                    opacity: 0;
+                }
             }
         </style>
     </head>
@@ -82,7 +109,7 @@
                 <br>
                 <span class="air air-temp">Luft: 4°C</span>
             </div>
-            <div id="clock" class="clock">Senast uppdaterad: 23:18</div>
+            <div id="clock" class="clock clock-animation">Senast uppdaterad: 23:18</div>
         </div>
         <div class="source">
             Kontrolldata från Temperatur.nu: 
