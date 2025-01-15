@@ -89,7 +89,7 @@ if response.status_code == 200:
                 align-items: center;
             }}
             .temperature {{
-                font-size: 14rem;
+                font-size: 5rem;
                 font-weight: bold;
                 color: #000099;
                 text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
