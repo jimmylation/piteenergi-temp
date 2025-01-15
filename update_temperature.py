@@ -87,26 +87,16 @@ if response.status_code == 200:
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
+            }}
+            .temperature {{
                 font-size: 7.5rem; /* 15rem för båda */
-            }}
-            .snow-temp {{
-                color: {snow_temp_color};
-                display: inline-block;
-                margin-bottom: 10px;
-            }}
-            .air-temp {{
-                color: {air_temp_color};
-                display: inline-block;
-                margin-top: 10px;
-            }}
-            .clock {{
-                font-size: 14rem;
-                color: #ffffff;
-                margin-top: 10px;
                 font-weight: bold;
-                text-shadow: 1px 1px 3px #000000;
-                display: none;
+                color: #000099;
+                text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
+                margin: 0;
             }}
+            .snow-temp {{ color: {snow_temp_color}; }}
+            .air-temp {{ color: {air_temp_color}; }}
             .error {{
                 font-size: 1.5rem;
                 color: #FF6347;
@@ -129,11 +119,23 @@ if response.status_code == 200:
             a:hover {{
                 color: #4a88b8;
             }}
+            .clock {{
+                font-size: 14rem;
+                color: #FFFFFF;
+                margin-top: 10px;
+                font-weight: bold;
+                text-shadow: 1px 1px 3px #000000;
+                opacity: 0;
+                transition: opacity 0.5s ease-in-out;
+            }}
+            .show-clock {{
+                opacity: 1;
+            }}
             .temperature {{
                 animation: fadeTemp 5s forwards;
             }}
             .clock-animation {{
-                animation: fadeClock 3s forwards;
+                animation: fadeClock 2s forwards;
                 animation-delay: 5s; /* Klockan syns efter 5 sek */
             }}
             @keyframes fadeTemp {{
