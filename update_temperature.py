@@ -89,7 +89,7 @@ if response.status_code == 200:
                 align-items: center;
             }}
             .temperature {{
-                font-size: 7.5rem; /* 15rem för båda */
+                font-size: 7.5rem;  /* 15rem total för båda temperaturerna */
                 font-weight: bold;
                 color: #000099;
                 text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
@@ -120,42 +120,11 @@ if response.status_code == 200:
                 color: #4a88b8;
             }}
             .clock {{
-                font-size: 14rem;
+                font-size: 1.2rem;
                 color: #FFFFFF;
                 margin-top: 10px;
                 font-weight: bold;
                 text-shadow: 1px 1px 3px #000000;
-                opacity: 0;
-                transition: opacity 0.5s ease-in-out;
-            }}
-            .show-clock {{
-                opacity: 1;
-            }}
-            .temperature {{
-                animation: fadeTemp 5s forwards;
-            }}
-            .clock-animation {{
-                animation: fadeClock 2s forwards;
-                animation-delay: 5s; /* Klockan syns efter 5 sek */
-            }}
-            @keyframes fadeTemp {{
-                0% {{
-                    opacity: 1;
-                }}
-                100% {{
-                    opacity: 1;
-                }}
-            }}
-            @keyframes fadeClock {{
-                0% {{
-                    opacity: 0;
-                }}
-                50% {{
-                    opacity: 1;
-                }}
-                100% {{
-                    opacity: 1;
-                }}
             }}
         </style>
     </head>
@@ -167,7 +136,7 @@ if response.status_code == 200:
                 <br>
                 <span class="air air-temp">Luft: {air_temp}°C</span>
             </div>
-            <div id="clock" class="clock clock-animation">Senast uppdaterad: {updated_time}</div>
+            <div id="clock" class="clock">Senast uppdaterad: {updated_time}</div>
         </div>
         <div class="source">
             Kontrolldata från Temperatur.nu: 
