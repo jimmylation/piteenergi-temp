@@ -1,21 +1,15 @@
-import requests
-from bs4 import BeautifulSoup
-import json
-import subprocess
-
-url = "https://temperatur-lindbacksstadion.onrender.com/"
-data_file = "temperature_data.json"
-
-def read_previous_data():
-    try:
-        with open(data_file, "r") as file:
-            return json.load(file)
-    except FileNotFoundError:
-        return {"snow_temp": None, "air_temp": None}
-
-def write_new_data(snow_temp, air_temp):
-    with open(data_file, "w") as file:
-        json.dump({"snow_temp": snow_temp, "air_temp": air_temp}, file)
+def get_temperature_color(temp):
+    """Returnerar färg baserat på temperaturintervall."""
+    if temp > 1:
+        return "#FF6666"  # Nedtonat rött
+    elif 1 >= temp > -4:
+        return "#CC66FF"  # Nedtonat violett
+    elif -4 >= temp > -10:
+        return "#6699FF"  # Nedtonat blått
+    elif -10 >= temp > -20:
+        return "#66CC66"  # Nedtonat grönt
+    else:
+        return "#FFFFFF"  # Vitt
 
 response = requests.get(url)
 if response.status_code == 200:
@@ -30,12 +24,9 @@ if response.status_code == 200:
     print(f"Snötemp: {snow_temp}")
     print(f"Lufttemp: {air_temp}")
     
-    previous_data = read_previous_data()
-    previous_snow_temp = previous_data["snow_temp"]
-    previous_air_temp = previous_data["air_temp"]
-    
-    snow_trend = "neutral" if previous_snow_temp is None else "up" if snow_temp > previous_snow_temp else "down"
-    air_trend = "neutral" if previous_air_temp is None else "up" if air_temp > previous_air_temp else "down"
+    # Hämta färger baserat på temperaturintervall
+    snow_color = get_temperature_color(snow_temp)
+    air_color = get_temperature_color(air_temp)
     
     html_content = f"""
     <!DOCTYPE html>
@@ -76,12 +67,15 @@ if response.status_code == 200:
             .temperature {{
                 font-size: 10rem;
                 font-weight: bold;
-                color: #6699FF;
-                text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
                 margin: 0;
             }}
-            .temperature span {{
-                display: block;
+            .snow {{
+                color: {snow_color};
+                text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
+            }}
+            .air {{
+                color: {air_color};
+                text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
             }}
             .source {{
                 font-size: 1rem;
@@ -102,8 +96,8 @@ if response.status_code == 200:
         <div class="header">Välkommen till Lindbäcksstadion!</div>
         <div class="temperature-container">
             <div id="temperature" class="temperature">
-                <span>Snö: {snow_temp}°</span>
-                <span>Luft: {air_temp}°</span>
+                <span class="snow">Snö: {snow_temp}°</span>
+                <span class="air">Luft: {air_temp}°</span>
             </div>
             <div id="clock" class="clock">Senast uppdaterad: {updated_time}</div>
         </div>
