@@ -87,16 +87,22 @@ if response.status_code == 200:
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
+                font-size: 7.5rem; /* 15rem för båda */
             }}
-            .temperature {{
-                font-size: 5rem;
+            .snow-temp {{
+                color: {snow_temp_color};
+            }}
+            .air-temp {{
+                color: {air_temp_color};
+            }}
+            .clock {{
+                font-size: 14rem;
+                color: #ffffff;
+                margin-top: 10px;
                 font-weight: bold;
-                color: #000099;
-                text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
-                margin: 0;
+                text-shadow: 1px 1px 3px #000000;
+                display: none;
             }}
-            .snow-temp {{ color: {snow_temp_color}; }}
-            .air-temp {{ color: {air_temp_color}; }}
             .error {{
                 font-size: 1.5rem;
                 color: #FF6347;
@@ -119,12 +125,33 @@ if response.status_code == 200:
             a:hover {{
                 color: #4a88b8;
             }}
-            .clock {{
-                font-size: 1.2rem;
-                color: #FFFFFF;
-                margin-top: 10px;
-                font-weight: bold;
-                text-shadow: 1px 1px 3px #000000;
+            .temperature {{
+                animation: fadeTemp 5s linear infinite;
+            }}
+            .clock-animation {{
+                animation: fadeClock 2s linear infinite;
+            }}
+            @keyframes fadeTemp {{
+                0% {{
+                    opacity: 1;
+                }}
+                50% {{
+                    opacity: 0;
+                }}
+                100% {{
+                    opacity: 1;
+                }}
+            }}
+            @keyframes fadeClock {{
+                0% {{
+                    opacity: 0;
+                }}
+                50% {{
+                    opacity: 1;
+                }}
+                100% {{
+                    opacity: 0;
+                }}
             }}
         </style>
     </head>
@@ -136,7 +163,7 @@ if response.status_code == 200:
                 <br>
                 <span class="air air-temp">Luft: {air_temp}°C</span>
             </div>
-            <div id="clock" class="clock">Senast uppdaterad: {updated_time}</div>
+            <div id="clock" class="clock clock-animation">Senast uppdaterad: {updated_time}</div>
         </div>
         <div class="source">
             Kontrolldata från Temperatur.nu: 
