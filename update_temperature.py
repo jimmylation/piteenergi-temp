@@ -52,6 +52,9 @@ if response.status_code == 200:
     snow_trend = "neutral" if previous_snow_temp is None else "up" if snow_temp > previous_snow_temp else "down"
     air_trend = "neutral" if previous_air_temp is None else "up" if air_temp > previous_air_temp else "down"
 
+    snow_trend_class = "snow-trend-up" if snow_trend == "up" else "snow-trend-down"
+    air_trend_class = "air-trend-up" if air_trend == "up" else "air-trend-down"
+
     html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -76,20 +79,22 @@ if response.status_code == 200:
                 text-align: center;
             }}
             .header {{
-                margin-top: 30px;  /* Större avstånd mellan header och temperaturer */
+                margin-top: 18px;
                 font-size: 3rem;
                 font-weight: bold;
                 text-shadow: 2px 2px 4px #000000;
             }}
             .temperature-container {{
+                position: relative;
                 flex: 1;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
+                margin-top: 30px;
             }}
             .temperature {{
-                font-size: 7.5rem;  /* 15rem total för båda temperaturerna */
+                font-size: 15rem;
                 font-weight: bold;
                 color: #000099;
                 text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
@@ -97,10 +102,32 @@ if response.status_code == 200:
             }}
             .snow-temp {{ color: {snow_temp_color}; }}
             .air-temp {{ color: {air_temp_color}; }}
-            .error {{
-                font-size: 1.5rem;
-                color: #FF6347;
+            .trend-arrow {{
+                position: absolute;
+                font-size: 10rem;
+                color: #FFFFFF;
+                opacity: 0.5;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: -1;
+            }}
+            .snow-trend-up {{ color: red; }}
+            .snow-trend-down {{ color: blue; }}
+            .air-trend-up {{ color: red; }}
+            .air-trend-down {{ color: blue; }}
+            .snow-trend {{
+                left: 100%;
+                margin-left: 10px;
+            }}
+            .air-trend {{
+                right: 100%;
+                margin-right: 10px;
+            }}
+            .clock {{
+                font-size: 1.2rem;
+                color: #FFFFFF;
                 margin-top: 10px;
+                font-weight: bold;
                 text-shadow: 1px 1px 3px #000000;
             }}
             .source {{
@@ -111,21 +138,6 @@ if response.status_code == 200:
                 padding: 10px 20px;
                 border-radius: 10px;
             }}
-            a {{
-                text-decoration: none;
-                color: #6fa3d9;
-                font-weight: bold;
-            }}
-            a:hover {{
-                color: #4a88b8;
-            }}
-            .clock {{
-                font-size: 1.2rem;
-                color: #FFFFFF;
-                margin-top: 10px;
-                font-weight: bold;
-                text-shadow: 1px 1px 3px #000000;
-            }}
         </style>
     </head>
     <body>
@@ -133,8 +145,10 @@ if response.status_code == 200:
         <div class="temperature-container">
             <div id="temperature" class="temperature">
                 <span class="snow snow-temp">Snö: {snow_temp}°C</span>
+                <span class="trend-arrow snow-trend {snow_trend_class}">↑</span>
                 <br>
                 <span class="air air-temp">Luft: {air_temp}°C</span>
+                <span class="trend-arrow air-trend {air_trend_class}">↓</span>
             </div>
             <div id="clock" class="clock">Senast uppdaterad: {updated_time}</div>
         </div>
