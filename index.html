@@ -1,3 +1,4 @@
+
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -5,14 +6,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Temperaturtrender</title>
         <style>
-            .trend-up {{ color: red; }}
-            .trend-down {{ color: blue; }}
+            .trend-up { color: red; }
+            .trend-down { color: blue; }
         </style>
     </head>
     <body>
         <h1>Temperaturtrender vid Lindbäcksstadion</h1>
-        <p>Senast uppdaterad: {updated_time}</p>
-        <p>Snötemp: {snow_temp}° <span class="trend-{snow_trend}">{"↑" if snow_trend == "up" else "↓" if snow_trend == "down" else ""}</span></p>
-        <p>Lufttemp: {air_temp}° <span class="trend-{air_trend}">{"↑" if air_trend == "up" else "↓" if air_trend == "down" else ""}</span></p>
+        <p>Senast uppdaterad: 13:38</p>
+        <p>Snötemp: 0° <span class="trend-neutral"></span></p>
+        <p>Lufttemp: 0° <span class="trend-neutral"></span></p>
     </body>
     </html>
+    
