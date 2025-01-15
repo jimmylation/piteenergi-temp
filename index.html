@@ -35,11 +35,14 @@
                 align-items: center;
             }
             .temperature {
-                font-size: 14rem;
+                font-size: 10rem;
                 font-weight: bold;
-                color: #000099;
+                color: #6699FF;
                 text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
                 margin: 0;
+            }
+            .temperature span {
+                display: block;
             }
             .source {
                 font-size: 1rem;
@@ -49,12 +52,10 @@
                 padding: 10px 20px;
                 border-radius: 10px;
             }
-            .clock {
-                font-size: 1.2rem;
-                color: #FFFFFF;
-                margin-top: 10px;
+            .source a {
+                text-decoration: none;
+                color: #ffffff;
                 font-weight: bold;
-                text-shadow: 1px 1px 3px #000000;
             }
         </style>
     </head>
@@ -62,12 +63,14 @@
         <div class="header">Välkommen till Lindbäcksstadion!</div>
         <div class="temperature-container">
             <div id="temperature" class="temperature">
-                Snö: 0° | Luft: 4°
+                <span>Snö: 0°</span>
+                <span>Luft: 4°</span>
             </div>
             <div id="clock" class="clock">Senast uppdaterad: 22:48</div>
         </div>
         <div class="source">
-            Temperaturdata hämtad från <a href="https://temperatur.nu" target="_blank">Temperatur.nu</a>
+            Kontrolldata från Temperatur.nu: 
+            <script type="text/javascript" src="https://www.temperatur.nu/jstemp.php?s=pitea-lindbacksstadion"></script>
         </div>
     </body>
     </html>
