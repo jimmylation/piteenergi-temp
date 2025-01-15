@@ -91,9 +91,13 @@ if response.status_code == 200:
             }}
             .snow-temp {{
                 color: {snow_temp_color};
+                display: inline-block;
+                margin-bottom: 10px;
             }}
             .air-temp {{
                 color: {air_temp_color};
+                display: inline-block;
+                margin-top: 10px;
             }}
             .clock {{
                 font-size: 14rem;
@@ -126,17 +130,15 @@ if response.status_code == 200:
                 color: #4a88b8;
             }}
             .temperature {{
-                animation: fadeTemp 5s linear infinite;
+                animation: fadeTemp 5s forwards;
             }}
             .clock-animation {{
-                animation: fadeClock 2s linear infinite;
+                animation: fadeClock 3s forwards;
+                animation-delay: 5s; /* Klockan syns efter 5 sek */
             }}
             @keyframes fadeTemp {{
                 0% {{
                     opacity: 1;
-                }}
-                50% {{
-                    opacity: 0;
                 }}
                 100% {{
                     opacity: 1;
@@ -150,7 +152,7 @@ if response.status_code == 200:
                     opacity: 1;
                 }}
                 100% {{
-                    opacity: 0;
+                    opacity: 1;
                 }}
             }}
         </style>
