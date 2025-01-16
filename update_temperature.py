@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import subprocess
+from datetime import datetime, timedelta
 
 url = "https://temperatur-lindbacksstadion.onrender.com/"
 data_file = "temperature_data.json"
@@ -11,11 +12,31 @@ def read_previous_data():
         with open(data_file, "r") as file:
             return json.load(file)
     except FileNotFoundError:
-        return {"snow_temp": None, "air_temp": None}
+        return {"records": []}
 
 def write_new_data(snow_temp, air_temp):
+    previous_data = read_previous_data()
+    now = datetime.now().isoformat()
+    previous_data["records"].append({"timestamp": now, "snow_temp": snow_temp, "air_temp": air_temp})
+
+    # Rensa data äldre än 1 timme
+    cutoff = datetime.now() - timedelta(hours=1)
+    previous_data["records"] = [
+        record for record in previous_data["records"]
+        if datetime.fromisoformat(record["timestamp"]) >= cutoff
+    ]
+
     with open(data_file, "w") as file:
-        json.dump({"snow_temp": snow_temp, "air_temp": air_temp}, file)
+        json.dump(previous_data, file)
+
+def calculate_trend(data, key):
+    if len(data) < 2:
+        return "neutral"
+    if data[-1][key] > data[0][key]:
+        return "up"
+    if data[-1][key] < data[0][key]:
+        return "down"
+    return "neutral"
 
 def get_temperature_color(temperature):
     if temperature > 1:
@@ -46,14 +67,11 @@ if response.status_code == 200:
     air_temp_color = get_temperature_color(air_temp)
 
     previous_data = read_previous_data()
-    previous_snow_temp = previous_data["snow_temp"]
-    previous_air_temp = previous_data["air_temp"]
+    snow_trend = calculate_trend(previous_data["records"], "snow_temp")
+    air_trend = calculate_trend(previous_data["records"], "air_temp")
 
-    snow_trend = "neutral" if previous_snow_temp is None else "up" if snow_temp > previous_snow_temp else "down"
-    air_trend = "neutral" if previous_air_temp is None else "up" if air_temp > previous_air_temp else "down"
-
-    snow_trend_class = "snow-trend-up" if snow_trend == "up" else "snow-trend-down"
-    air_trend_class = "air-trend-up" if air_trend == "up" else "air-trend-down"
+    snow_trend_class = "trend-up" if snow_trend == "up" else "trend-down"
+    air_trend_class = "trend-up" if air_trend == "up" else "trend-down"
 
     html_content = f"""
     <!DOCTYPE html>
@@ -99,30 +117,18 @@ if response.status_code == 200:
                 color: #000099;
                 text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
                 margin: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }}
             .snow-temp {{ color: {snow_temp_color}; }}
             .air-temp {{ color: {air_temp_color}; }}
             .trend-arrow {{
-                position: absolute;
                 font-size: 6rem;
-                color: #FFFFFF;
-                opacity: 0.5;
-                top: 50%;
-                transform: translateY(-50%);
-                z-index: -1;
-            }}
-            .snow-trend-up {{ color: red; }}
-            .snow-trend-down {{ color: blue; }}
-            .air-trend-up {{ color: red; }}
-            .air-trend-down {{ color: blue; }}
-            .snow-trend {{
-                left: 100%;
                 margin-left: 10px;
             }}
-            .air-trend {{
-                right: 100%;
-                margin-right: 10px;
-            }}
+            .trend-up {{ color: red; }}
+            .trend-down {{ color: blue; }}
             .clock {{
                 font-size: 1.2rem;
                 color: #FFFFFF;
@@ -138,10 +144,6 @@ if response.status_code == 200:
                 padding: 10px 20px;
                 border-radius: 10px;
             }}
-            a {{
-                text-decoration: none;
-                color: #FFFFFF;
-            }}
         </style>
     </head>
     <body>
@@ -149,10 +151,11 @@ if response.status_code == 200:
         <div class="temperature-container">
             <div id="temperature" class="temperature">
                 <span class="snow snow-temp">Snön {snow_temp}°C</span>
-                <span class="trend-arrow snow-trend {snow_trend_class}">↑</span>
-                <br>
+                <span class="trend-arrow {snow_trend_class}">{'↑' if snow_trend == 'up' else '↓'}</span>
+            </div>
+            <div id="temperature" class="temperature">
                 <span class="air air-temp">Luften {air_temp}°C</span>
-                <span class="trend-arrow air-trend {air_trend_class}">↓</span>
+                <span class="trend-arrow {air_trend_class}">{'↑' if air_trend == 'up' else '↓'}</span>
             </div>
             <div id="clock" class="clock">Senast uppdaterad: {updated_time}</div>
         </div>
@@ -163,7 +166,7 @@ if response.status_code == 200:
     </body>
     </html>
     """
-    
+
     # Skriv till index.html
     with open("index.html", "w") as file:
         file.write(html_content)
