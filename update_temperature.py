@@ -94,7 +94,7 @@ if response.status_code == 200:
                 margin-top: 30px;
             }}
             .temperature {{
-                font-size: 15rem;
+                font-size: 7rem;
                 font-weight: bold;
                 color: #000099;
                 text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
@@ -144,10 +144,10 @@ if response.status_code == 200:
         <div class="header">Välkommen till Lindbäcksstadion!</div>
         <div class="temperature-container">
             <div id="temperature" class="temperature">
-                <span class="snow snow-temp">Snö: {snow_temp}°C</span>
+                <span class="snow snow-temp">Snön {snow_temp}°C</span>
                 <span class="trend-arrow snow-trend {snow_trend_class}">↑</span>
                 <br>
-                <span class="air air-temp">Luft: {air_temp}°C</span>
+                <span class="air air-temp">Luften {air_temp}°C</span>
                 <span class="trend-arrow air-trend {air_trend_class}">↓</span>
             </div>
             <div id="clock" class="clock">Senast uppdaterad: {updated_time}</div>
