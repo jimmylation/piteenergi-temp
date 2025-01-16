@@ -94,7 +94,7 @@ if response.status_code == 200:
                 margin-top: 30px;
             }}
             .temperature {{
-                font-size: 7rem;
+                font-size: 8rem;
                 font-weight: bold;
                 color: #000099;
                 text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
@@ -104,7 +104,7 @@ if response.status_code == 200:
             .air-temp {{ color: {air_temp_color}; }}
             .trend-arrow {{
                 position: absolute;
-                font-size: 10rem;
+                font-size: 6rem;
                 color: #FFFFFF;
                 opacity: 0.5;
                 top: 50%;
@@ -137,6 +137,10 @@ if response.status_code == 200:
                 background: rgba(0, 0, 0, 0.5);
                 padding: 10px 20px;
                 border-radius: 10px;
+            }}
+            a {{
+                text-decoration: none;
+                color: #FFFFFF;
             }}
         </style>
     </head>
