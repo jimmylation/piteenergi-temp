@@ -71,27 +71,4 @@ html_content = f"""
     <div class="temperature-container">
         <div id="temperature" class="temperature">
             <span class="snow snow-temp">Snön {snow_temp}°C</span>
-            <br>
-            <span class="air air-temp">Luften {air_temp}°C</span>
-        </div>
-        <div id="clock" class="clock">Senast uppdaterad: {updated_time}</div>
-    </div>
-    <div class="source">
-        Kontrolldata från Temperatur.nu: 
-        <script type="text/javascript" src="https://www.temperatur.nu/jstemp.php?s=pitea-lindbacksstadion"></script>
-    </div>
-</body>
-</html>
-"""
-
-# Skriv till index.html
-with open("index.html", "w") as file:
-    file.write(html_content)
-
-write_new_data(snow_temp, air_temp)
-print("HTML och data uppdaterade.")
-
-# Push till GitHub
-subprocess.run(["git", "add", "index.html"])
-subprocess.run(["git", "commit", "-m", "Uppdaterad index.html utan trendpilar"])
-subprocess.run(["git", "push"])
+          
