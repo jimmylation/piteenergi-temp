@@ -104,10 +104,12 @@ if response.status_code == 200:
             }}
             .clock {{
                 font-size: 1.2rem;
-                color: #FFFFFF;
+                color: #4A90E2;
                 margin-top: 10px;
                 font-weight: bold;
                 text-shadow: 1px 1px 3px #000000;
+                opacity: 0;
+                transition: opacity 1s ease-in-out;
             }}
             .source {{
                 font-size: 1rem;
@@ -137,6 +139,24 @@ if response.status_code == 200:
             Kontrolldata från Temperatur.nu: 
             <script type="text/javascript" src="https://www.temperatur.nu/jstemp.php?s=pitea-lindbacksstadion"></script>
         </div>
+
+        <script>
+            let temperature = document.getElementById("temperature");
+            let clock = document.getElementById("clock");
+            
+            // Funktion för att växla mellan temperatur och klocka
+            function toggleDisplay() {{
+                clock.style.opacity = 1;
+                temperature.style.opacity = 0;
+                setTimeout(function() {{
+                    clock.style.opacity = 0;
+                    temperature.style.opacity = 1;
+                }}, 3000);
+            }}
+
+            // Visa klockan i 3 sekunder och temperaturerna i 5 sekunder
+            setInterval(toggleDisplay, 8000);
+        </script>
     </body>
     </html>
     """
