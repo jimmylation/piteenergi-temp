@@ -2,8 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import subprocess
-from datetime import datetime
-import pytz
 
 url = "https://temperatur-lindbacksstadion.onrender.com/"
 data_file = "temperature_data.json"
@@ -31,7 +29,6 @@ def get_temperature_color(temperature):
     else:
         return "#FFFFFF"  # Vit
 
-# Hämta temperaturdata
 response = requests.get(url)
 if response.status_code == 200:
     print("Data hämtades framgångsrikt!")
@@ -48,10 +45,7 @@ if response.status_code == 200:
     snow_temp_color = get_temperature_color(snow_temp)
     air_temp_color = get_temperature_color(air_temp)
 
-    # Beräkna svensk tid (till exempel för att hantera sommar/vintertid)
-    stockholm_tz = pytz.timezone('Europe/Stockholm')
-    local_time = datetime.now(stockholm_tz).strftime("%H:%M:%S")
-
+    
     html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -109,13 +103,11 @@ if response.status_code == 200:
                 z-index: -1;
             }}
             .clock {{
-                font-size: 15rem;
-                color: #4A90E2;
+                font-size: 1.2rem;
+                color: #FFFFFF;
                 margin-top: 10px;
                 font-weight: bold;
                 text-shadow: 1px 1px 3px #000000;
-                opacity: 0;
-                transition: opacity 1s ease-in-out;
             }}
             .source {{
                 font-size: 1rem;
@@ -139,30 +131,12 @@ if response.status_code == 200:
                 <br>
                 <span class="air air-temp">Luften {air_temp}°C</span>
             </div>
-            <div id="clock" class="clock">{local_time}</div>
+            <div id="clock" class="clock">Senast uppdaterad: {updated_time}</div>
         </div>
         <div class="source">
             Kontrolldata från Temperatur.nu: 
             <script type="text/javascript" src="https://www.temperatur.nu/jstemp.php?s=pitea-lindbacksstadion"></script>
         </div>
-
-        <script>
-            let temperature = document.getElementById("temperature");
-            let clock = document.getElementById("clock");
-
-            // Funktion för att växla mellan temperatur och klocka
-            function toggleDisplay() {{
-                clock.style.opacity = 1;
-                temperature.style.opacity = 0;
-                setTimeout(function() {{
-                    clock.style.opacity = 0;
-                    temperature.style.opacity = 1;
-                }}, 3000);
-            }}
-
-            // Visa klockan i 3 sekunder och temperaturerna i 5 sekunder
-            setInterval(toggleDisplay, 8000);
-        </script>
     </body>
     </html>
     """
