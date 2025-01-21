@@ -42,6 +42,9 @@ def get_temperature_color(temperature):
         return "#FFFFFF"  # Vit
 
 def create_log_html(log_data):
+    # Sortera loggdata så att de senaste värdena visas först
+    log_data = sorted(log_data, key=lambda x: make_aware(datetime.strptime(x["actual_time"], "%Y-%m-%d %H:%M:%S")), reverse=True)
+
     # Generera HTML med logg
     html_content = f"""
     <!DOCTYPE html>
