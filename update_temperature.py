@@ -25,7 +25,7 @@ def get_temperature_color(temperature):
     elif -4 > temperature >= -10:
         return "#3333FF"  # Blå
     elif -10 > temperature >= -20:
-        return "#338A33"  # Grön
+        return "#57D957"  # Grön
     else:
         return "#FFFFFF"  # Vit
 
