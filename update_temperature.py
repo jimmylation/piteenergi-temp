@@ -22,7 +22,7 @@ def write_new_data(snow_temp, air_temp):
         json.dump({"snow_temp": snow_temp, "air_temp": air_temp}, file)
 
 # Uppdatera loggfilen
-def update_log_file(timestamp, snow_temp, air_temp):
+def update_log_file(timestamp, snow_temp, air_temp, updated_time):
     # Försök läsa existerande loggdata
     try:
         with open(log_file, "r") as file:
@@ -33,7 +33,7 @@ def update_log_file(timestamp, snow_temp, air_temp):
         soup = BeautifulSoup("", "html.parser")
         table = soup.new_tag("table", style="width: 90%; margin: 30px auto; border-collapse: collapse; background-color: #fafafa;")
         header_row = soup.new_tag("tr")
-        headers = ["Tid", "Snötemp (°C)", "Lufttemp (°C)"]
+        headers = ["Tid", "Uppdaterad Tid", "Snötemp (°C)", "Lufttemp (°C)"]
         for header in headers:
             th = soup.new_tag("th", style="padding: 12px; background-color: #4CAF50; color: white; font-size: 1.2em; text-align: center;")
             th.string = header
@@ -44,11 +44,14 @@ def update_log_file(timestamp, snow_temp, air_temp):
     new_row = soup.new_tag("tr", style="text-align: center;")
     time_cell = soup.new_tag("td", style="padding: 8px 15px; border: 1px solid #ddd;")
     time_cell.string = timestamp
+    updated_time_cell = soup.new_tag("td", style="padding: 8px 15px; border: 1px solid #ddd;")
+    updated_time_cell.string = updated_time
     snow_cell = soup.new_tag("td", style="padding: 8px 15px; border: 1px solid #ddd;")
     snow_cell.string = str(snow_temp)
     air_cell = soup.new_tag("td", style="padding: 8px 15px; border: 1px solid #ddd;")
     air_cell.string = str(air_temp)
     new_row.append(time_cell)
+    new_row.append(updated_time_cell)
     new_row.append(snow_cell)
     new_row.append(air_cell)
     table.append(new_row)
@@ -93,7 +96,7 @@ if response.status_code == 200:
 
     # Uppdatera loggfilen
     current_time = datetime.now().strftime("%H:%M:%S")
-    update_log_file(current_time, snow_temp, air_temp)
+    update_log_file(current_time, snow_temp, air_temp, updated_time)
 
     # Uppdatera HTML-sidan
     snow_temp_color = get_temperature_color(snow_temp)
@@ -160,6 +163,7 @@ if response.status_code == 200:
         <table>
             <tr>
                 <th>Tid</th>
+                <th>Uppdaterad Tid</th>
                 <th>Snötemp (°C)</th>
                 <th>Lufttemp (°C)</th>
             </tr>
