@@ -29,6 +29,18 @@ def write_log_data(log_data):
     with open(data_file, "w") as file:
         json.dump(log_data, file)
 
+def get_temperature_color(temperature):
+    if temperature > 1:
+        return "#FF6666"  # Röd
+    elif 1 >= temperature >= -4:
+        return "#AC64E9"  # Violett
+    elif -4 > temperature >= -10:
+        return "#6666FF"  # Blå
+    elif -10 > temperature >= -20:
+        return "#57D957"  # Grön
+    else:
+        return "#FFFFFF"  # Vit
+
 def create_log_html(log_data):
     # Generera HTML med logg
     html_content = f"""
@@ -127,10 +139,7 @@ def calculate_trend(log_data):
         return "Ingen trend"
 
     # Hämta temperaturer från den senaste timmen
-    recent_entries = [
-        entry for entry in log_data
-        if make_aware(datetime.strptime(entry["actual_time"], "%Y-%m-%d %H:%M:%S")) > make_aware(datetime.now()) - timedelta(hours=1)
-    ]
+    recent_entries = [entry for entry in log_data if make_aware(datetime.strptime(entry["actual_time"], "%Y-%m-%d %H:%M:%S")) > make_aware(datetime.now()) - timedelta(hours=1)]
 
     if len(recent_entries) < 2:
         return "Ingen trend"
@@ -148,7 +157,7 @@ def calculate_trend(log_data):
 
 def log_temperature():
     try:
-        retrieved_time, snow_temp, air_temp = fetch_temperature()
+        updated_time, snow_temp, air_temp = fetch_temperature()
 
         # Skapa tidszonsmedveten aktuell tid
         actual_time = make_aware(datetime.now()).strftime("%Y-%m-%d %H:%M:%S")
@@ -156,10 +165,10 @@ def log_temperature():
         log_data = read_log_data()
 
         # Lägg till ny data endast om hämtad tid är ny
-        if not log_data or log_data[0]["retrieved_time"] != retrieved_time:
+        if not log_data or log_data[0]["retrieved_time"] != updated_time:
             log_data.insert(0, {
                 "actual_time": actual_time,
-                "retrieved_time": retrieved_time,
+                "retrieved_time": updated_time,
                 "snow_temp": snow_temp,
                 "air_temp": air_temp
             })
@@ -172,24 +181,16 @@ def log_temperature():
 
         # Filtrera bort data äldre än tre timmar
         cutoff_time = make_aware(datetime.now()) - log_duration
-        log_data = [
-            entry for entry in log_data
-            if make_aware(datetime.strptime(entry["actual_time"], "%Y-%m-%d %H:%M:%S")) >= cutoff_time
-        ]
+        log_data = [entry for entry in log_data if make_aware(datetime.strptime(entry["actual_time"], "%Y-%m-%d %H:%M:%S")) >= cutoff_time]
 
         write_log_data(log_data)
         create_log_html(log_data)
 
-        # Konfigurera Git och push ändringar
-        subprocess.run(["git", "config", "--global", "user.name", "GitHub Actions Bot"])
-        subprocess.run(["git", "config", "--global", "user.email", "actions@github.com"])
+        # Push till GitHub
         subprocess.run(["git", "add", html_file])
         subprocess.run(["git", "commit", "-m", "Uppdaterad temperature_log.html med trend"])
-        subprocess.run([
-            "git", "push",
-            f"https://x-access-token:{os.getenv('GH_TOKEN')}@github.com/{os.getenv('GITHUB_REPOSITORY')}",
-            "HEAD:main"
-        ])
+        subprocess.run(["git", "push", f"https://x-access-token:{os.getenv('GH_TOKEN')}@github.com/{os.getenv('GITHUB_REPOSITORY')}"])
+
     except Exception as e:
         print(f"Error: {e}")
 
