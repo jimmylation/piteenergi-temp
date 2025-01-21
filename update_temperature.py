@@ -36,12 +36,6 @@ html_content = f"""
             align-items: center;
             margin-top: 30px;
         }}
-        .temperature-row {{
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 10px 0;
-        }}
         .temperature {{
             font-size: 8rem;
             font-weight: bold;
@@ -49,11 +43,17 @@ html_content = f"""
             text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
             margin: 0;
         }}
-        .snow-temp {{ color: {snow_temp_color}; }}
-        .air-temp {{ color: {air_temp_color}; }}
+        .temperature-row {{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }}
+        .snow-temp {{ color: {get_temperature_color(snow_temp)}; }}
+        .air-temp {{ color: {get_temperature_color(air_temp)}; }}
         .trend-arrow {{
             font-size: 3rem;
-            margin-left: 20px;
+            margin-left: 15px;
             color: #FFFFFF;
         }}
         .snow-trend-up {{ color: red; }}
