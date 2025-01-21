@@ -31,7 +31,7 @@ def update_log_file(timestamp, snow_temp, air_temp):
     except FileNotFoundError:
         # Om loggfilen inte finns, skapa en ny tabell
         soup = BeautifulSoup("", "html.parser")
-        table = soup.new_tag("table", border="1", style="width: 100%; text-align: center; border-collapse: collapse;")
+        table = soup.new_tag("table", border="1", style="width: 100%; text-align: center;")
         header_row = soup.new_tag("tr")
         headers = ["Tid", "Snötemp (°C)", "Lufttemp (°C)"]
         for header in headers:
@@ -53,9 +53,9 @@ def update_log_file(timestamp, snow_temp, air_temp):
     new_row.append(air_cell)
     table.append(new_row)
 
-    # Begränsa till senaste 3 timmars data (om mer än 12 rader, ta bort den äldsta)
+    # Begränsa till senaste timmens data (om mer än 12 rader, ta bort den äldsta)
     rows = table.find_all("tr")
-    if len(rows) > 13:  # 13 rader = 1 rad för headers + 12 loggade timmar (3 timmar)
+    if len(rows) > 12:  # 12 rader = 1 rad för headers + 11 loggade timmar
         rows[1].extract()
 
     # Spara tabellen i loggfilen
@@ -161,23 +161,6 @@ if response.status_code == 200:
                 padding: 10px 20px;
                 border-radius: 10px;
             }}
-            table {{
-                width: 80%;
-                margin: 20px 0;
-                border-collapse: collapse;
-                background-color: rgba(255, 255, 255, 0.8);
-            }}
-            th, td {{
-                padding: 10px;
-                border: 1px solid #ddd;
-            }}
-            th {{
-                background-color: #4CAF50;
-                color: white;
-            }}
-            tr:nth-child(even) {{
-                background-color: #f2f2f2;
-            }}
             a {{
                 text-decoration: none;
                 color: #FFFFFF;
@@ -197,17 +180,6 @@ if response.status_code == 200:
         <div class="source">
             Kontrolldata från Temperatur.nu: 
             <script type="text/javascript" src="https://www.temperatur.nu/jstemp.php?s=pitea-lindbacksstadion"></script>
-        </div>
-        <div class="log-table">
-            <h2>Temperatur Logg (Senaste 3 timmar)</h2>
-            <table>
-                <tr>
-                    <th>Tid</th>
-                    <th>Snötemp (°C)</th>
-                    <th>Lufttemp (°C)</th>
-                </tr>
-                <!-- Här kommer tabellen med data -->
-            </table>
         </div>
     </body>
     </html>
