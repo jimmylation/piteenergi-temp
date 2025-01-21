@@ -7,7 +7,7 @@ import os
 
 # URL till temperaturdatakällan
 url = "https://temperatur-lindbacksstadion.onrender.com/"
-data_file = "temperature_data.json"
+data_file = "temperature_log.json"
 html_file = "temperature_log.html"
 
 # Läs tidigare loggad data
@@ -29,7 +29,7 @@ def calculate_trend(temps):
         return "Ingen trend"
     
     # Beräkna förändring över senaste 60 minuterna
-    change = temps[-1][1] - temps[0][1]
+    change = temps[-1][1] - temps[0][1]  # temp[-1][1] betyder den senaste temperaturen
     if change > 0:
         return "Uppåt"
     elif change < 0:
@@ -123,8 +123,13 @@ def log_temperature():
         updated_time, snow_temp, air_temp = get_temperatures()
         if updated_time is not None:
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            snow_trend = calculate_trend([entry for entry in log_data if entry['snow_temp'] is not None])
-            air_trend = calculate_trend([entry for entry in log_data if entry['air_temp'] is not None])
+            
+            # Filtrera de senaste temperaturvärdena från log_data
+            snow_temps = [entry for entry in log_data if entry['snow_temp'] is not None]
+            air_temps = [entry for entry in log_data if entry['air_temp'] is not None]
+            
+            snow_trend = calculate_trend(snow_temps)  # Skicka listan av snötemperaturer
+            air_trend = calculate_trend(air_temps)    # Skicka listan av lufttemperaturer
 
             log_data.insert(0, {
                 'timestamp': timestamp,
