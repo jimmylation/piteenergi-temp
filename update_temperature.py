@@ -40,7 +40,7 @@ def update_log_file(timestamp, snow_temp, air_temp, updated_time):
             header_row.append(th)
         table.append(header_row)
 
-    # Lägg till en ny rad med data
+    # Lägg till en ny rad med data före de befintliga raderna
     new_row = soup.new_tag("tr", style="text-align: center;")
     time_cell = soup.new_tag("td", style="padding: 8px 15px; border: 1px solid #ddd;")
     time_cell.string = timestamp
@@ -54,12 +54,14 @@ def update_log_file(timestamp, snow_temp, air_temp, updated_time):
     new_row.append(updated_time_cell)
     new_row.append(snow_cell)
     new_row.append(air_cell)
-    table.append(new_row)
 
-    # Begränsa till senaste timmens data (om mer än 12 rader, ta bort den äldsta)
+    # Lägg till den nya raden som den första raden
+    table.insert(1, new_row)
+
+    # Begränsa till senaste 3 timmars data (om mer än 91 rader, ta bort den äldsta)
     rows = table.find_all("tr")
-    if len(rows) > 12:  # 12 rader = 1 rad för headers + 11 loggade timmar
-        rows[1].extract()
+    if len(rows) > 91:  # 91 rader = 1 rad för headers + 90 loggade timmar
+        rows[-1].extract()  # Ta bort den äldsta raden (sist i tabellen)
 
     # Spara tabellen i loggfilen
     soup.clear()
@@ -156,16 +158,6 @@ if response.status_code == 200:
             tr:hover {{
                 background-color: #f1f1f1;
             }}
-            .footer {{
-                font-size: 0.9em;
-                color: #666666;
-                padding: 10px;
-                background-color: #333333;
-                color: white;
-                position: fixed;
-                width: 100%;
-                bottom: 0;
-            }}
         </style>
     </head>
     <body>
@@ -188,9 +180,6 @@ if response.status_code == 200:
 
     html_content += """
         </table>
-        <div class="footer">
-            Senast uppdaterad: {updated_time}
-        </div>
     </body>
     </html>
     """
