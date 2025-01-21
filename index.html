@@ -43,29 +43,23 @@
                 text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
                 margin: 0;
             }
+            .temperature-row {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 20px 0;
+            }
             .snow-temp { color: #0000FF; }
             .air-temp { color: #0000FF; }
             .trend-arrow {
-                position: absolute;
-                font-size: 6rem;
+                font-size: 3rem;
+                margin-left: 15px;
                 color: #FFFFFF;
-                opacity: 0.5;
-                top: 50%;
-                transform: translateY(-50%);
-                z-index: -1;
             }
             .snow-trend-up { color: red; }
             .snow-trend-down { color: blue; }
             .air-trend-up { color: red; }
             .air-trend-down { color: blue; }
-            .snow-trend {
-                left: 100%;
-                margin-left: 10px;
-            }
-            .air-trend {
-                right: 100%;
-                margin-right: 10px;
-            }
             .clock {
                 font-size: 1.2rem;
                 color: #FFFFFF;
@@ -90,14 +84,15 @@
     <body>
         <div class="header">Välkommen till Lindbäcksstadion!</div>
         <div class="temperature-container">
-            <div id="temperature" class="temperature">
+            <div class="temperature-row">
                 <span class="snow snow-temp">Snön -7°C</span>
-                <span class="trend-arrow snow-trend snow-trend-down">↑</span>
-                <br>
-                <span class="air air-temp">Luften -7°C</span>
-                <span class="trend-arrow air-trend air-trend-down">↓</span>
+                <span class="trend-arrow snow-trend-down">↑</span>
             </div>
-            <div id="clock" class="clock">Senast uppdaterad: 09:48</div>
+            <div class="temperature-row">
+                <span class="air air-temp">Luften -7°C</span>
+                <span class="trend-arrow air-trend-down">↓</span>
+            </div>
+            <div id="clock" class="clock">Senast uppdaterad: 09:58</div>
         </div>
         <div class="source">
             Kontrolldata från Temperatur.nu: 
