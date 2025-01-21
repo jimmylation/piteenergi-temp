@@ -106,7 +106,7 @@ def log_temperature_data():
                 # Uppdatera senaste loggade tid
                 last_logged_time = updated_time
 
-                # Skriv nya temperaturdata
+                # Skriv nya temperaturdata (till temperature_data.json)
                 write_new_data(snow_temp, air_temp)
                 print(f"Temperaturer loggade vid: {current_time}")
 
