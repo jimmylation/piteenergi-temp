@@ -19,13 +19,13 @@ def write_new_data(snow_temp, air_temp):
 
 def get_temperature_color(temperature):
     if temperature > 1:
-        return "#FF0000"  # Röd
+        return "#FF6666"  # Röd
     elif 1 >= temperature >= -4:
-        return "#8A2BE2"  # Violett
+        return "#AC64E9"  # Violett
     elif -4 > temperature >= -10:
-        return "#0000FF"  # Blå
+        return "#3333FF"  # Blå
     elif -10 > temperature >= -20:
-        return "#006400"  # Grön
+        return "#338A33"  # Grön
     else:
         return "#FFFFFF"  # Vit
 
