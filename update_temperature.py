@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import subprocess
 from datetime import datetime
+import pytz  # För att hantera tidszoner
 
 url = "https://temperatur-lindbacksstadion.onrender.com/"
 data_file = "temperature_data.json"
@@ -94,8 +95,13 @@ if response.status_code == 200:
     print(f"Snötemp: {snow_temp}")
     print(f"Lufttemp: {air_temp}")
 
-    # Uppdatera loggfilen
-    current_time = datetime.now().strftime("%H:%M:%S")
+    # Hämtar den aktuella tiden i svensk tid (UTC +1/2, beroende på sommar/vintertid)
+    swedish_timezone = pytz.timezone('Europe/Stockholm')
+    current_time_utc = datetime.utcnow().replace(tzinfo=pytz.utc)  # UTC-tid
+    current_time_swedish = current_time_utc.astimezone(swedish_timezone)  # Konvertera till svensk tid
+    current_time = current_time_swedish.strftime("%H:%M:%S")  # Tid i formatet HH:MM:SS
+
+    # Uppdatera loggfilen med svensk tid
     update_log_file(current_time, snow_temp, air_temp, updated_time)
 
     # Uppdatera HTML-sidan
@@ -194,7 +200,7 @@ if response.status_code == 200:
 
     # Push till GitHub
     subprocess.run(["git", "add", "temperature_log.html", data_file])
-    subprocess.run(["git", "commit", "-m", "Uppdaterad temperature_log.html med förbättrad stil"])
+    subprocess.run(["git", "commit", "-m", "Uppdaterad temperature_log.html med svensk tid"])
     subprocess.run(["git", "push"])
 
 else:
