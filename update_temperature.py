@@ -40,7 +40,7 @@ def update_log_file(timestamp, snow_temp, air_temp, updated_time):
             header_row.append(th)
         table.append(header_row)
 
-    # Lägg till en ny rad med data före de befintliga raderna
+    # Lägg till en ny rad med data (nyaste data hamnar först)
     new_row = soup.new_tag("tr", style="text-align: center;")
     time_cell = soup.new_tag("td", style="padding: 8px 15px; border: 1px solid #ddd;")
     time_cell.string = timestamp
@@ -55,13 +55,13 @@ def update_log_file(timestamp, snow_temp, air_temp, updated_time):
     new_row.append(snow_cell)
     new_row.append(air_cell)
 
-    # Lägg till den nya raden som den första raden
-    table.insert(1, new_row)
+    # Lägg till den nya raden högst upp i tabellen (nyaste data överst)
+    table.insert(1, new_row)  # Index 1 för att lägga till direkt efter headern
 
     # Begränsa till senaste 3 timmars data (om mer än 91 rader, ta bort den äldsta)
     rows = table.find_all("tr")
     if len(rows) > 91:  # 91 rader = 1 rad för headers + 90 loggade timmar
-        rows[-1].extract()  # Ta bort den äldsta raden (sist i tabellen)
+        rows[-1].extract()  # Ta bort den sista raden (äldsta datan)
 
     # Spara tabellen i loggfilen
     soup.clear()
