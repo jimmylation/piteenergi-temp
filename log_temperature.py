@@ -28,6 +28,15 @@ def calculate_trend(temps):
     if len(temps) < 2:
         return "Ingen trend"
     
+    # Här antas att varje element är en ordbok med nyckeln 'snow_temp' eller 'air_temp'
+    change = temps[-1]['snow_temp'] - temps[0]['snow_temp']  # För snötemp
+    if change > 0:
+        return "Uppåt"
+    elif change < 0:
+        return "Nedåt"
+    else:
+        return "Oförändrat"
+    
     # Beräkna förändring över senaste 60 minuterna
     change = temps[-1][1] - temps[0][1]  # temp[-1][1] betyder den senaste temperaturen
     if change > 0:
