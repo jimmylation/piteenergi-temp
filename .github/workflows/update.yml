@@ -1,10 +1,10 @@
-name: Update Temperature
+name: Update and Log Temperature
 
 on:
   schedule:
-    - cron: "*/1 * * * *" # Kör enligt schema varje minut
-  workflow_dispatch:       # Manuell körning
-  push:                    # Kör vid ändringar i Python-filer
+    - cron: "*/2 * * * *" # Körs varannan minut
+  workflow_dispatch:         # Manuell körning
+  push:                      # Körs vid ändringar i Python-filer
     paths:
       - '**.py'
 
@@ -25,10 +25,13 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install requests beautifulsoup4
+        pip install requests beautifulsoup4 pytz
 
-    - name: Run Python script
+    - name: Run Update Temperature Script
       run: python update_temperature.py
+
+    - name: Run Log Temperature Script
+      run: python log_temperature.py
 
     - name: Push changes
       env:
@@ -37,6 +40,6 @@ jobs:
         git config --global user.name "GitHub Actions Bot"
         git config --global user.email "actions@github.com"
         git pull --rebase origin main || true
-        git add index.html
-        git commit -m "Update index.html" || echo "No changes to commit"
+        git add index.html temperature_log.html
+        git commit -m "Update index.html and temperature_log.html" || echo "No changes to commit"
         git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }} HEAD:main
