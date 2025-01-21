@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import json
 import pytz
 import subprocess
+import os
 
 url = "https://temperatur-lindbacksstadion.onrender.com/"
 data_file = "temperature_log.json"
@@ -13,29 +14,23 @@ log_duration = timedelta(hours=3)  # Loggdata max tre timmar gammal
 # Tidszon för Stockholm
 local_tz = pytz.timezone("Europe/Stockholm")
 
-
+# Funktion för att skapa tidszonsmedvetna datetime
 def make_aware(dt):
-    """Skapa tidszonsmedveten datetime."""
     return local_tz.localize(dt) if dt.tzinfo is None else dt
 
-
 def read_log_data():
-    """Läs loggdata från fil."""
     try:
         with open(data_file, "r") as file:
             return json.load(file)
     except FileNotFoundError:
         return []
 
-
 def write_log_data(log_data):
-    """Skriv loggdata till fil."""
     with open(data_file, "w") as file:
         json.dump(log_data, file)
 
-
 def create_log_html(log_data):
-    """Generera HTML för loggdata."""
+    # Generera HTML med logg
     html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -101,7 +96,7 @@ def create_log_html(log_data):
             <td>{entry['retrieved_time']}</td>
             <td>{entry['snow_temp']}</td>
             <td>{entry['air_temp']}</td>
-            <td>{entry.get('trend', 'Ingen trend')}</td>
+            <td>{entry['trend']}</td>
         </tr>
         """
 
@@ -115,9 +110,7 @@ def create_log_html(log_data):
     with open(html_file, "w") as file:
         file.write(html_content)
 
-
 def fetch_temperature():
-    """Hämta temperaturdata från server."""
     response = requests.get(url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -128,20 +121,21 @@ def fetch_temperature():
     else:
         raise Exception(f"Failed to fetch data: {response.status_code}")
 
-
 def calculate_trend(log_data):
-    """Beräkna trend för den senaste timmen."""
+    # Kolla temperaturtrenden för den senaste timmen
     if len(log_data) < 2:
         return "Ingen trend"
 
+    # Hämta temperaturer från den senaste timmen
     recent_entries = [
-        entry for entry in log_data if make_aware(datetime.strptime(entry["actual_time"], "%Y-%m-%d %H:%M:%S"))
-        > make_aware(datetime.now()) - timedelta(hours=1)
+        entry for entry in log_data
+        if make_aware(datetime.strptime(entry["actual_time"], "%Y-%m-%d %H:%M:%S")) > make_aware(datetime.now()) - timedelta(hours=1)
     ]
 
     if len(recent_entries) < 2:
         return "Ingen trend"
 
+    # Jämför första och sista temperatur för trend
     first_temp = recent_entries[0]
     last_temp = recent_entries[-1]
 
@@ -152,16 +146,16 @@ def calculate_trend(log_data):
     else:
         return "Oförändrad"
 
-
 def log_temperature():
-    """Hämta, logga och publicera temperaturdata."""
     try:
         retrieved_time, snow_temp, air_temp = fetch_temperature()
 
+        # Skapa tidszonsmedveten aktuell tid
         actual_time = make_aware(datetime.now()).strftime("%Y-%m-%d %H:%M:%S")
 
         log_data = read_log_data()
 
+        # Lägg till ny data endast om hämtad tid är ny
         if not log_data or log_data[0]["retrieved_time"] != retrieved_time:
             log_data.insert(0, {
                 "actual_time": actual_time,
@@ -170,24 +164,34 @@ def log_temperature():
                 "air_temp": air_temp
             })
 
+        # Beräkna trenden för den senaste timmen
         trend = calculate_trend(log_data)
+
+        # Lägg till trend i loggdata
         log_data[0]["trend"] = trend
 
+        # Filtrera bort data äldre än tre timmar
         cutoff_time = make_aware(datetime.now()) - log_duration
-        log_data = [entry for entry in log_data if make_aware(datetime.strptime(entry["actual_time"], "%Y-%m-%d %H:%M:%S")) >= cutoff_time]
+        log_data = [
+            entry for entry in log_data
+            if make_aware(datetime.strptime(entry["actual_time"], "%Y-%m-%d %H:%M:%S")) >= cutoff_time
+        ]
 
         write_log_data(log_data)
         create_log_html(log_data)
 
-        # Push ändringarna till GitHub
+        # Konfigurera Git och push ändringar
         subprocess.run(["git", "config", "--global", "user.name", "GitHub Actions Bot"])
         subprocess.run(["git", "config", "--global", "user.email", "actions@github.com"])
         subprocess.run(["git", "add", html_file])
         subprocess.run(["git", "commit", "-m", "Uppdaterad temperature_log.html med trend"])
-        subprocess.run(["git", "push", "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}", "HEAD:main"])
+        subprocess.run([
+            "git", "push",
+            f"https://x-access-token:{os.getenv('GH_TOKEN')}@github.com/{os.getenv('GITHUB_REPOSITORY')}",
+            "HEAD:main"
+        ])
     except Exception as e:
         print(f"Error: {e}")
-
 
 if __name__ == "__main__":
     log_temperature()
