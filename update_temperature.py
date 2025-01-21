@@ -31,22 +31,22 @@ def update_log_file(timestamp, snow_temp, air_temp):
     except FileNotFoundError:
         # Om loggfilen inte finns, skapa en ny tabell
         soup = BeautifulSoup("", "html.parser")
-        table = soup.new_tag("table", border="1", style="width: 100%; text-align: center;")
+        table = soup.new_tag("table", style="width: 90%; margin: 30px auto; border-collapse: collapse; background-color: #fafafa;")
         header_row = soup.new_tag("tr")
         headers = ["Tid", "Snötemp (°C)", "Lufttemp (°C)"]
         for header in headers:
-            th = soup.new_tag("th")
+            th = soup.new_tag("th", style="padding: 12px; background-color: #4CAF50; color: white; font-size: 1.2em; text-align: center;")
             th.string = header
             header_row.append(th)
         table.append(header_row)
 
     # Lägg till en ny rad med data
-    new_row = soup.new_tag("tr")
-    time_cell = soup.new_tag("td")
+    new_row = soup.new_tag("tr", style="text-align: center;")
+    time_cell = soup.new_tag("td", style="padding: 8px 15px; border: 1px solid #ddd;")
     time_cell.string = timestamp
-    snow_cell = soup.new_tag("td")
+    snow_cell = soup.new_tag("td", style="padding: 8px 15px; border: 1px solid #ddd;")
     snow_cell.string = str(snow_temp)
-    air_cell = soup.new_tag("td")
+    air_cell = soup.new_tag("td", style="padding: 8px 15px; border: 1px solid #ddd;")
     air_cell.string = str(air_temp)
     new_row.append(time_cell)
     new_row.append(snow_cell)
@@ -105,96 +105,93 @@ if response.status_code == 200:
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Temperaturtrender vid Lindbäcksstadion</title>
+        <title>Temperatur Logg vid Lindbäcksstadion</title>
         <style>
             body {{
+                font-family: 'Arial', sans-serif;
+                background-color: #f0f0f0;
+                color: #333333;
                 margin: 0;
                 padding: 0;
-                height: 100vh;
-                width: 100vw;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                align-items: center;
-                background: url('background.jpg') no-repeat center center fixed;
-                background-size: cover;
-                font-family: 'Arial', sans-serif;
-                color: #ffffff;
                 text-align: center;
             }}
-            .header {{
-                margin-top: 18px;
-                font-size: 3rem;
-                font-weight: bold;
-                text-shadow: 2px 2px 4px #000000;
+            h1 {{
+                background-color: #4CAF50;
+                color: white;
+                padding: 15px;
+                font-size: 2.5em;
             }}
-            .temperature-container {{
-                position: relative;
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                margin-top: 30px;
+            table {{
+                width: 80%;
+                margin: 30px auto;
+                border-collapse: collapse;
+                background-color: #fafafa;
             }}
-            .temperature {{
-                font-size: 8rem;
-                font-weight: bold;
-                color: #000099;
-                text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
-                margin: 0;
+            th, td {{
+                padding: 12px;
+                text-align: center;
+                border: 1px solid #ddd;
             }}
-            .snow-temp {{ color: {snow_temp_color}; }}
-            .air-temp {{ color: {air_temp_color}; }}
-            .clock {{
-                font-size: 1.2rem;
-                color: #FFFFFF;
-                margin-top: 10px;
-                font-weight: bold;
-                text-shadow: 1px 1px 3px #000000;
+            th {{
+                background-color: #4CAF50;
+                color: white;
+                font-size: 1.2em;
             }}
-            .source {{
-                font-size: 1rem;
-                margin-bottom: 20px;
-                text-shadow: 1px 1px 3px #000000;
-                background: rgba(0, 0, 0, 0.5);
-                padding: 10px 20px;
-                border-radius: 10px;
+            tr:nth-child(even) {{
+                background-color: #f9f9f9;
             }}
-            a {{
-                text-decoration: none;
-                color: #FFFFFF;
+            tr:hover {{
+                background-color: #f1f1f1;
+            }}
+            .footer {{
+                font-size: 0.9em;
+                color: #666666;
+                padding: 10px;
+                background-color: #333333;
+                color: white;
+                position: fixed;
+                width: 100%;
+                bottom: 0;
             }}
         </style>
     </head>
     <body>
-        <div class="header">Välkommen till Lindbäcksstadion!</div>
-        <div class="temperature-container">
-            <div id="temperature" class="temperature">
-                <span class="snow snow-temp">Snön {snow_temp}°C</span>
-                <br>
-                <span class="air air-temp">Luften {air_temp}°C</span>
-            </div>
-            <div id="clock" class="clock">Senast uppdaterad: {updated_time}</div>
-        </div>
-        <div class="source">
-            Kontrolldata från Temperatur.nu: 
-            <script type="text/javascript" src="https://www.temperatur.nu/jstemp.php?s=pitea-lindbacksstadion"></script>
+        <h1>Temperatur Logg vid Lindbäcksstadion</h1>
+        <table>
+            <tr>
+                <th>Tid</th>
+                <th>Snötemp (°C)</th>
+                <th>Lufttemp (°C)</th>
+            </tr>
+    """
+    
+    # Lägg till loggdata till tabellen
+    with open(log_file, "r") as file:
+        soup = BeautifulSoup(file, "html.parser")
+        rows = soup.find_all("tr")[1:]  # Hoppa över headerraden
+        for row in rows:
+            html_content += str(row)
+
+    html_content += """
+        </table>
+        <div class="footer">
+            Senast uppdaterad: {updated_time}
         </div>
     </body>
     </html>
     """
-    
-    # Skriv till index.html
-    with open("index.html", "w") as file:
+
+    # Skriv till temperature_log.html
+    with open(log_file, "w") as file:
         file.write(html_content)
 
     write_new_data(snow_temp, air_temp)
-    print("HTML och data uppdaterade.")
+    print("Loggfilen och data uppdaterades.")
 
     # Push till GitHub
-    subprocess.run(["git", "add", "index.html", log_file])
-    subprocess.run(["git", "commit", "-m", "Uppdaterad index.html och loggfil"])
+    subprocess.run(["git", "add", "temperature_log.html", data_file])
+    subprocess.run(["git", "commit", "-m", "Uppdaterad temperature_log.html med förbättrad stil"])
     subprocess.run(["git", "push"])
+
 else:
     print(f"Kunde inte hämta data: {response.status_code}")
