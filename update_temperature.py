@@ -45,16 +45,6 @@ if response.status_code == 200:
     snow_temp_color = get_temperature_color(snow_temp)
     air_temp_color = get_temperature_color(air_temp)
 
-    previous_data = read_previous_data()
-    previous_snow_temp = previous_data["snow_temp"]
-    previous_air_temp = previous_data["air_temp"]
-
-    snow_trend = "neutral" if previous_snow_temp is None else "up" if snow_temp > previous_snow_temp else "down"
-    air_trend = "neutral" if previous_air_temp is None else "up" if air_temp > previous_air_temp else "down"
-
-    snow_trend_class = "snow-trend-up" if snow_trend == "up" else "snow-trend-down"
-    air_trend_class = "air-trend-up" if air_trend == "up" else "air-trend-down"
-
     html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -85,35 +75,23 @@ if response.status_code == 200:
                 text-shadow: 2px 2px 4px #000000;
             }}
             .temperature-container {{
+                position: relative;
+                flex: 1;
                 display: flex;
                 flex-direction: column;
-                align-items: center;
                 justify-content: center;
+                align-items: center;
                 margin-top: 30px;
-            }}
-            .temperature-row {{
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin: 20px 0;
             }}
             .temperature {{
                 font-size: 8rem;
                 font-weight: bold;
+                color: #000099;
                 text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
                 margin: 0;
             }}
             .snow-temp {{ color: {snow_temp_color}; }}
             .air-temp {{ color: {air_temp_color}; }}
-            .trend-arrow {{
-                font-size: 4rem;
-                margin-left: 15px;
-                text-shadow: 1px 1px 3px #000000;
-            }}
-            .snow-trend-up {{ color: red; }}
-            .snow-trend-down {{ color: blue; }}
-            .air-trend-up {{ color: red; }}
-            .air-trend-down {{ color: blue; }}
             .clock {{
                 font-size: 1.2rem;
                 color: #FFFFFF;
@@ -138,13 +116,10 @@ if response.status_code == 200:
     <body>
         <div class="header">Välkommen till Lindbäcksstadion!</div>
         <div class="temperature-container">
-            <div class="temperature-row">
+            <div id="temperature" class="temperature">
                 <span class="snow snow-temp">Snön {snow_temp}°C</span>
-                <span class="trend-arrow {snow_trend_class}">↑</span>
-            </div>
-            <div class="temperature-row">
+                <br>
                 <span class="air air-temp">Luften {air_temp}°C</span>
-                <span class="trend-arrow {air_trend_class}">↓</span>
             </div>
             <div id="clock" class="clock">Senast uppdaterad: {updated_time}</div>
         </div>
