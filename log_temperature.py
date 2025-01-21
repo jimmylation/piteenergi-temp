@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import json
 import pytz
-import os
 import subprocess
 
 url = "https://temperatur-lindbacksstadion.onrender.com/"
@@ -14,23 +13,29 @@ log_duration = timedelta(hours=3)  # Loggdata max tre timmar gammal
 # Tidszon för Stockholm
 local_tz = pytz.timezone("Europe/Stockholm")
 
-# Funktion för att skapa tidszonsmedvetna datetime
+
 def make_aware(dt):
+    """Skapa tidszonsmedveten datetime."""
     return local_tz.localize(dt) if dt.tzinfo is None else dt
 
+
 def read_log_data():
+    """Läs loggdata från fil."""
     try:
         with open(data_file, "r") as file:
             return json.load(file)
     except FileNotFoundError:
         return []
 
+
 def write_log_data(log_data):
+    """Skriv loggdata till fil."""
     with open(data_file, "w") as file:
         json.dump(log_data, file)
 
+
 def create_log_html(log_data):
-    # Generera HTML med logg
+    """Generera HTML för loggdata."""
     html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -83,6 +88,7 @@ def create_log_html(log_data):
                     <th>Hämtad Tid</th>
                     <th>Snötemperatur (°C)</th>
                     <th>Lufttemperatur (°C)</th>
+                    <th>Trend (Senaste Timme)</th>
                 </tr>
             </thead>
             <tbody>
@@ -95,6 +101,7 @@ def create_log_html(log_data):
             <td>{entry['retrieved_time']}</td>
             <td>{entry['snow_temp']}</td>
             <td>{entry['air_temp']}</td>
+            <td>{entry.get('trend', 'Ingen trend')}</td>
         </tr>
         """
 
@@ -108,7 +115,9 @@ def create_log_html(log_data):
     with open(html_file, "w") as file:
         file.write(html_content)
 
+
 def fetch_temperature():
+    """Hämta temperaturdata från server."""
     response = requests.get(url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -119,39 +128,19 @@ def fetch_temperature():
     else:
         raise Exception(f"Failed to fetch data: {response.status_code}")
 
-def log_temperature():
-    try:
-        retrieved_time, snow_temp, air_temp = fetch_temperature()
-        
-        # Skapa tidszonsmedveten aktuell tid
-        actual_time = make_aware(datetime.now()).strftime("%Y-%m-%d %H:%M:%S")
 
-        log_data = read_log_data()
+def calculate_trend(log_data):
+    """Beräkna trend för den senaste timmen."""
+    if len(log_data) < 2:
+        return "Ingen trend"
 
-        # Lägg till ny data endast om hämtad tid är ny
-        if not log_data or log_data[0]["retrieved_time"] != retrieved_time:
-            log_data.insert(0, {
-                "actual_time": actual_time,
-                "retrieved_time": retrieved_time,
-                "snow_temp": snow_temp,
-                "air_temp": air_temp
-            })
+    recent_entries = [
+        entry for entry in log_data if make_aware(datetime.strptime(entry["actual_time"], "%Y-%m-%d %H:%M:%S"))
+        > make_aware(datetime.now()) - timedelta(hours=1)
+    ]
 
-        # Filtrera bort data äldre än tre timmar
-        cutoff_time = make_aware(datetime.now()) - log_duration
-        log_data = [entry for entry in log_data if make_aware(datetime.strptime(entry["actual_time"], "%Y-%m-%d %H:%M:%S")) >= cutoff_time]
+    if len(recent_entries) < 2:
+        return "Ingen trend"
 
-        write_log_data(log_data)
-        create_log_html(log_data)
-
-        # Push till GitHub
-        token = os.getenv("GH_TOKEN")  # Hämta GH_TOKEN från miljövariabler
-        repo_url = f"https://x-access-token:{token}@github.com/${{ github.repository }}"
-        subprocess.run(["git", "add", html_file])
-        subprocess.run(["git", "commit", "-m", "Uppdaterad temperature_log.html"])
-        subprocess.run(["git", "push", repo_url])
-    except Exception as e:
-        print(f"Error: {e}")
-
-if __name__ == "__main__":
-    log_temperature()
+    first_temp = recent_entries[0]
+    last_temp = recent_entries[-1
