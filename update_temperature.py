@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import subprocess
 from datetime import datetime, timezone, timedelta
+import time
 
 url = "https://temperatur-lindbacksstadion.onrender.com/"
 data_file = "temperature_data.json"
@@ -56,9 +57,9 @@ def update_log_file(timestamp, snow_temp, air_temp, updated_time):
     new_row.append(air_cell)
     table.append(new_row)
 
-    # Begränsa till senaste timmens data (om mer än 12 rader, ta bort den äldsta)
+    # Begränsa till senaste tre timmarna data (om mer än 90 rader, ta bort den äldsta)
     rows = table.find_all("tr")
-    if len(rows) > 12:  # 12 rader = 1 rad för headers + 11 loggade timmar
+    if len(rows) > 91:  # 91 rader = 1 rad för headers + 90 loggade värden (en per minut i 3 timmar)
         rows[1].extract()
 
     # Spara tabellen i loggfilen
@@ -88,124 +89,130 @@ def get_swedish_time():
     else:  # Vintertid (mellan november och februari)
         return datetime.now(timezone(timedelta(hours=1))).strftime("%H:%M:%S")
 
-# Huvudlogik för att hämta och processa data
-response = requests.get(url)
-if response.status_code == 200:
-    print("Data hämtades framgångsrikt!")
-    soup = BeautifulSoup(response.text, 'html.parser')
+# Funktion för att hämta och processa data
+def fetch_and_process_data():
+    response = requests.get(url)
+    if response.status_code == 200:
+        print("Data hämtades framgångsrikt!")
+        soup = BeautifulSoup(response.text, 'html.parser')
 
-    updated_time = soup.find(id="updated-time").text
-    snow_temp = int(soup.find(id="snow-temp").text.replace("°", ""))
-    air_temp = int(soup.find(id="air-temp").text.replace("°", ""))
+        updated_time = soup.find(id="updated-time").text
+        snow_temp = int(soup.find(id="snow-temp").text.replace("°", ""))
+        air_temp = int(soup.find(id="air-temp").text.replace("°", ""))
 
-    print(f"Uppdaterad tid: {updated_time}")
-    print(f"Snötemp: {snow_temp}")
-    print(f"Lufttemp: {air_temp}")
+        print(f"Uppdaterad tid: {updated_time}")
+        print(f"Snötemp: {snow_temp}")
+        print(f"Lufttemp: {air_temp}")
 
-    # Hämtar den aktuella tiden i svensk tid (UTC +1/2, beroende på sommar/vintertid)
-    current_time = get_swedish_time()  # Tid i formatet HH:MM:SS
+        # Hämtar den aktuella tiden i svensk tid (UTC +1/2, beroende på sommar/vintertid)
+        current_time = get_swedish_time()  # Tid i formatet HH:MM:SS
 
-    # Uppdatera loggfilen med svensk tid
-    update_log_file(current_time, snow_temp, air_temp, updated_time)
+        # Uppdatera loggfilen med svensk tid
+        update_log_file(current_time, snow_temp, air_temp, updated_time)
 
-    # Uppdatera HTML-sidan
-    snow_temp_color = get_temperature_color(snow_temp)
-    air_temp_color = get_temperature_color(air_temp)
+        # Uppdatera HTML-sidan
+        snow_temp_color = get_temperature_color(snow_temp)
+        air_temp_color = get_temperature_color(air_temp)
 
-    html_content = f"""
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Temperatur Logg vid Lindbäcksstadion</title>
-        <style>
-            body {{
-                font-family: 'Arial', sans-serif;
-                background-color: #f0f0f0;
-                color: #333333;
-                margin: 0;
-                padding: 0;
-                text-align: center;
-            }}
-            h1 {{
-                background-color: #4CAF50;
-                color: white;
-                padding: 15px;
-                font-size: 2.5em;
-            }}
-            table {{
-                width: 80%;
-                margin: 30px auto;
-                border-collapse: collapse;
-                background-color: #fafafa;
-            }}
-            th, td {{
-                padding: 12px;
-                text-align: center;
-                border: 1px solid #ddd;
-            }}
-            th {{
-                background-color: #4CAF50;
-                color: white;
-                font-size: 1.2em;
-            }}
-            tr:nth-child(even) {{
-                background-color: #f9f9f9;
-            }}
-            tr:hover {{
-                background-color: #f1f1f1;
-            }}
-            .footer {{
-                font-size: 0.9em;
-                color: #666666;
-                padding: 10px;
-                background-color: #333333;
-                color: white;
-                position: fixed;
-                width: 100%;
-                bottom: 0;
-            }}
-        </style>
-    </head>
-    <body>
-        <h1>Temperatur Logg vid Lindbäcksstadion</h1>
-        <table>
-            <tr>
-                <th>Tid</th>
-                <th>Uppdaterad Tid</th>
-                <th>Snötemp (°C)</th>
-                <th>Lufttemp (°C)</th>
-            </tr>
-    """
-    
-    # Lägg till loggdata till tabellen
-    with open(log_file, "r") as file:
-        soup = BeautifulSoup(file, "html.parser")
-        rows = soup.find_all("tr")[1:]  # Hoppa över headerraden
-        for row in rows:
-            html_content += str(row)
+        html_content = f"""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Temperatur Logg vid Lindbäcksstadion</title>
+            <style>
+                body {{
+                    font-family: 'Arial', sans-serif;
+                    background-color: #f0f0f0;
+                    color: #333333;
+                    margin: 0;
+                    padding: 0;
+                    text-align: center;
+                }}
+                h1 {{
+                    background-color: #4CAF50;
+                    color: white;
+                    padding: 15px;
+                    font-size: 2.5em;
+                }}
+                table {{
+                    width: 80%;
+                    margin: 30px auto;
+                    border-collapse: collapse;
+                    background-color: #fafafa;
+                }}
+                th, td {{
+                    padding: 12px;
+                    text-align: center;
+                    border: 1px solid #ddd;
+                }}
+                th {{
+                    background-color: #4CAF50;
+                    color: white;
+                    font-size: 1.2em;
+                }}
+                tr:nth-child(even) {{
+                    background-color: #f9f9f9;
+                }}
+                tr:hover {{
+                    background-color: #f1f1f1;
+                }}
+                .footer {{
+                    font-size: 0.9em;
+                    color: #666666;
+                    padding: 10px;
+                    background-color: #333333;
+                    color: white;
+                    position: fixed;
+                    width: 100%;
+                    bottom: 0;
+                }}
+            </style>
+        </head>
+        <body>
+            <h1>Temperatur Logg vid Lindbäcksstadion</h1>
+            <table>
+                <tr>
+                    <th>Tid</th>
+                    <th>Uppdaterad Tid</th>
+                    <th>Snötemp (°C)</th>
+                    <th>Lufttemp (°C)</th>
+                </tr>
+        """
+        
+        # Lägg till loggdata till tabellen
+        with open(log_file, "r") as file:
+            soup = BeautifulSoup(file, "html.parser")
+            rows = soup.find_all("tr")[1:]  # Hoppa över headerraden
+            for row in rows:
+                html_content += str(row)
 
-    html_content += """
-        </table>
-        <div class="footer">
-            Senast uppdaterad: {updated_time}
-        </div>
-    </body>
-    </html>
-    """
+        html_content += """
+            </table>
+            <div class="footer">
+                Senast uppdaterad: {updated_time}
+            </div>
+        </body>
+        </html>
+        """
 
-    # Skriv till temperature_log.html
-    with open(log_file, "w") as file:
-        file.write(html_content)
+        # Skriv till temperature_log.html
+        with open(log_file, "w") as file:
+            file.write(html_content)
 
-    write_new_data(snow_temp, air_temp)
-    print("Loggfilen och data uppdaterades.")
+        write_new_data(snow_temp, air_temp)
+        print("Loggfilen och data uppdaterades.")
 
-    # Push till GitHub
-    subprocess.run(["git", "add", "temperature_log.html", data_file])
-    subprocess.run(["git", "commit", "-m", "Uppdaterad temperature_log.html med svensk tid"])
-    subprocess.run(["git", "push"])
+        # Push till GitHub
+        subprocess.run(["git", "add", "temperature_log.html", data_file])
+        subprocess.run(["git", "commit", "-m", "Uppdaterad temperature_log.html med svensk tid"])
+        subprocess.run(["git", "push"])
 
-else:
-    print(f"Kunde inte hämta data: {response.status_code}")
+    else:
+        print(f"Kunde inte hämta data: {response.status_code}")
+
+# Huvudloop för att köra varje 2 minut
+while True:
+    fetch_and_process_data()
+    time.sleep(120)  # Vänta i 120 sekunder (2 minuter)
