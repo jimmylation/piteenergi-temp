@@ -56,7 +56,7 @@ def create_log_file_header():
                 <style>
                     body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; }
                     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+                    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
                     th { background-color: #4CAF50; color: white; }
                     tr:hover { background-color: #f1f1f1; }
                     h1 { text-align: center; color: #333; font-size: 24px; }
