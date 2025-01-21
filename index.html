@@ -54,14 +54,24 @@
                 transform: translateY(-50%);
                 z-index: -1;
             }
+            .snow-trend-up { color: red; }
+            .snow-trend-down { color: blue; }
+            .air-trend-up { color: red; }
+            .air-trend-down { color: blue; }
+            .snow-trend {
+                left: 100%;
+                margin-left: 10px;
+            }
+            .air-trend {
+                right: 100%;
+                margin-right: 10px;
+            }
             .clock {
                 font-size: 1.2rem;
-                color: #4A90E2;
+                color: #FFFFFF;
                 margin-top: 10px;
                 font-weight: bold;
                 text-shadow: 1px 1px 3px #000000;
-                opacity: 0;
-                transition: opacity 1s ease-in-out;
             }
             .source {
                 font-size: 1rem;
@@ -82,33 +92,17 @@
         <div class="temperature-container">
             <div id="temperature" class="temperature">
                 <span class="snow snow-temp">Snön -7°C</span>
+                <span class="trend-arrow snow-trend snow-trend-down">↑</span>
                 <br>
-                <span class="air air-temp">Luften -8°C</span>
+                <span class="air air-temp">Luften -7°C</span>
+                <span class="trend-arrow air-trend air-trend-down">↓</span>
             </div>
-            <div id="clock" class="clock">Senast uppdaterad: 09:18</div>
+            <div id="clock" class="clock">Senast uppdaterad: 09:48</div>
         </div>
         <div class="source">
             Kontrolldata från Temperatur.nu: 
             <script type="text/javascript" src="https://www.temperatur.nu/jstemp.php?s=pitea-lindbacksstadion"></script>
         </div>
-
-        <script>
-            let temperature = document.getElementById("temperature");
-            let clock = document.getElementById("clock");
-            
-            // Funktion för att växla mellan temperatur och klocka
-            function toggleDisplay() {
-                clock.style.opacity = 1;
-                temperature.style.opacity = 0;
-                setTimeout(function() {
-                    clock.style.opacity = 0;
-                    temperature.style.opacity = 1;
-                }, 3000);
-            }
-
-            // Visa klockan i 3 sekunder och temperaturerna i 5 sekunder
-            setInterval(toggleDisplay, 8000);
-        </script>
     </body>
     </html>
     
