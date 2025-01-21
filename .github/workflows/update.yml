@@ -2,8 +2,11 @@ name: Update Temperature
 
 on:
   schedule:
-    - cron: "*/1 * * * *"
-  workflow_dispatch:
+    - cron: "*/1 * * * *" # Kör enligt schema varje minut
+  workflow_dispatch:       # Manuell körning
+  push:                    # Kör vid ändringar i Python-filer
+    paths:
+      - '**.py'
 
 jobs:
   update:
