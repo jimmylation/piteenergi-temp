@@ -143,4 +143,51 @@ def calculate_trend(log_data):
         return "Ingen trend"
 
     first_temp = recent_entries[0]
-    last_temp = recent_entries[-1
+    last_temp = recent_entries[-1]
+
+    if last_temp['snow_temp'] > first_temp['snow_temp']:
+        return "Stigande"
+    elif last_temp['snow_temp'] < first_temp['snow_temp']:
+        return "Fallande"
+    else:
+        return "Oförändrad"
+
+
+def log_temperature():
+    """Hämta, logga och publicera temperaturdata."""
+    try:
+        retrieved_time, snow_temp, air_temp = fetch_temperature()
+
+        actual_time = make_aware(datetime.now()).strftime("%Y-%m-%d %H:%M:%S")
+
+        log_data = read_log_data()
+
+        if not log_data or log_data[0]["retrieved_time"] != retrieved_time:
+            log_data.insert(0, {
+                "actual_time": actual_time,
+                "retrieved_time": retrieved_time,
+                "snow_temp": snow_temp,
+                "air_temp": air_temp
+            })
+
+        trend = calculate_trend(log_data)
+        log_data[0]["trend"] = trend
+
+        cutoff_time = make_aware(datetime.now()) - log_duration
+        log_data = [entry for entry in log_data if make_aware(datetime.strptime(entry["actual_time"], "%Y-%m-%d %H:%M:%S")) >= cutoff_time]
+
+        write_log_data(log_data)
+        create_log_html(log_data)
+
+        # Push ändringarna till GitHub
+        subprocess.run(["git", "config", "--global", "user.name", "GitHub Actions Bot"])
+        subprocess.run(["git", "config", "--global", "user.email", "actions@github.com"])
+        subprocess.run(["git", "add", html_file])
+        subprocess.run(["git", "commit", "-m", "Uppdaterad temperature_log.html med trend"])
+        subprocess.run(["git", "push", "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}", "HEAD:main"])
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+if __name__ == "__main__":
+    log_temperature()
