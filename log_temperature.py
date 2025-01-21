@@ -36,15 +36,6 @@ def calculate_trend(temps):
         return "Nedåt"
     else:
         return "Oförändrat"
-    
-    # Beräkna förändring över senaste 60 minuterna
-    change = temps[-1][1] - temps[0][1]  # temp[-1][1] betyder den senaste temperaturen
-    if change > 0:
-        return "Uppåt"
-    elif change < 0:
-        return "Nedåt"
-    else:
-        return "Oförändrat"
 
 # Hämta temperatur och uppdaterad tid
 def get_temperatures():
