@@ -42,11 +42,9 @@ if response.status_code == 200:
     print(f"Snötemp: {snow_temp}")
     print(f"Lufttemp: {air_temp}")
 
-    # Bestäm färger
     snow_temp_color = get_temperature_color(snow_temp)
     air_temp_color = get_temperature_color(air_temp)
 
-    # Läs tidigare data för trend
     previous_data = read_previous_data()
     previous_snow_temp = previous_data["snow_temp"]
     previous_air_temp = previous_data["air_temp"]
@@ -57,7 +55,6 @@ if response.status_code == 200:
     snow_trend_class = "snow-trend-up" if snow_trend == "up" else "snow-trend-down"
     air_trend_class = "air-trend-up" if air_trend == "up" else "air-trend-down"
 
-    # Skapa HTML-innehåll
     html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -88,20 +85,11 @@ if response.status_code == 200:
                 text-shadow: 2px 2px 4px #000000;
             }}
             .temperature-container {{
-                position: relative;
-                flex: 1;
                 display: flex;
                 flex-direction: column;
-                justify-content: center;
                 align-items: center;
+                justify-content: center;
                 margin-top: 30px;
-            }}
-            .temperature {{
-                font-size: 8rem;
-                font-weight: bold;
-                color: #000099;
-                text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
-                margin: 0;
             }}
             .temperature-row {{
                 display: flex;
@@ -109,12 +97,18 @@ if response.status_code == 200:
                 justify-content: center;
                 margin: 20px 0;
             }}
+            .temperature {{
+                font-size: 8rem;
+                font-weight: bold;
+                text-shadow: 1px 1px 2px #000000, 2px 2px 4px #000000, -1px -1px 2px #000000;
+                margin: 0;
+            }}
             .snow-temp {{ color: {snow_temp_color}; }}
             .air-temp {{ color: {air_temp_color}; }}
             .trend-arrow {{
-                font-size: 3rem;
+                font-size: 4rem;
                 margin-left: 15px;
-                color: #FFFFFF;
+                text-shadow: 1px 1px 3px #000000;
             }}
             .snow-trend-up {{ color: red; }}
             .snow-trend-down {{ color: blue; }}
@@ -161,12 +155,11 @@ if response.status_code == 200:
     </body>
     </html>
     """
-
+    
     # Skriv till index.html
     with open("index.html", "w") as file:
         file.write(html_content)
 
-    # Uppdatera datalagring
     write_new_data(snow_temp, air_temp)
     print("HTML och data uppdaterade.")
 
