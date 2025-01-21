@@ -82,6 +82,7 @@ def create_log_html(log_data):
                     <th>Hämtad Tid</th>
                     <th>Snötemperatur (°C)</th>
                     <th>Lufttemperatur (°C)</th>
+                    <th>Trend (Senaste Timme)</th>
                 </tr>
             </thead>
             <tbody>
@@ -94,6 +95,7 @@ def create_log_html(log_data):
             <td>{entry['retrieved_time']}</td>
             <td>{entry['snow_temp']}</td>
             <td>{entry['air_temp']}</td>
+            <td>{entry['trend']}</td>
         </tr>
         """
 
@@ -118,10 +120,32 @@ def fetch_temperature():
     else:
         raise Exception(f"Failed to fetch data: {response.status_code}")
 
+def calculate_trend(log_data):
+    # Kolla temperaturtrenden för den senaste timmen
+    if len(log_data) < 2:
+        return "Ingen trend"
+
+    # Hämta temperaturer från den senaste timmen
+    recent_entries = [entry for entry in log_data if make_aware(datetime.strptime(entry["actual_time"], "%Y-%m-%d %H:%M:%S")) > make_aware(datetime.now()) - timedelta(hours=1)]
+
+    if len(recent_entries) < 2:
+        return "Ingen trend"
+
+    # Jämför första och sista temperatur för trend
+    first_temp = recent_entries[0]
+    last_temp = recent_entries[-1]
+
+    if last_temp['snow_temp'] > first_temp['snow_temp']:
+        return "Stigande"
+    elif last_temp['snow_temp'] < first_temp['snow_temp']:
+        return "Fallande"
+    else:
+        return "Oförändrad"
+
 def log_temperature():
     try:
         retrieved_time, snow_temp, air_temp = fetch_temperature()
-        
+
         # Skapa tidszonsmedveten aktuell tid
         actual_time = make_aware(datetime.now()).strftime("%Y-%m-%d %H:%M:%S")
 
@@ -136,6 +160,12 @@ def log_temperature():
                 "air_temp": air_temp
             })
 
+        # Beräkna trenden för den senaste timmen
+        trend = calculate_trend(log_data)
+
+        # Lägg till trend i loggdata
+        log_data[0]["trend"] = trend
+
         # Filtrera bort data äldre än tre timmar
         cutoff_time = make_aware(datetime.now()) - log_duration
         log_data = [entry for entry in log_data if make_aware(datetime.strptime(entry["actual_time"], "%Y-%m-%d %H:%M:%S")) >= cutoff_time]
@@ -145,7 +175,7 @@ def log_temperature():
 
         # Push till GitHub
         subprocess.run(["git", "add", html_file])
-        subprocess.run(["git", "commit", "-m", "Uppdaterad temperature_log.html"])
+        subprocess.run(["git", "commit", "-m", "Uppdaterad temperature_log.html med trend"])
         subprocess.run(["git", "push"])
     except Exception as e:
         print(f"Error: {e}")
