@@ -10,6 +10,13 @@ data_file = "temperature_log.json"
 html_file = "temperature_log.html"
 log_duration = timedelta(hours=3)  # Loggdata max tre timmar gammal
 
+# Tidszon för Stockholm
+local_tz = pytz.timezone("Europe/Stockholm")
+
+# Funktion för att skapa tidszonsmedvetna datetime
+def make_aware(dt):
+    return local_tz.localize(dt) if dt.tzinfo is None else dt
+
 def read_log_data():
     try:
         with open(data_file, "r") as file:
@@ -114,7 +121,9 @@ def fetch_temperature():
 def log_temperature():
     try:
         retrieved_time, snow_temp, air_temp = fetch_temperature()
-        actual_time = datetime.now(pytz.timezone("Europe/Stockholm")).strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Skapa tidszonsmedveten aktuell tid
+        actual_time = make_aware(datetime.now()).strftime("%Y-%m-%d %H:%M:%S")
 
         log_data = read_log_data()
 
@@ -128,8 +137,8 @@ def log_temperature():
             })
 
         # Filtrera bort data äldre än tre timmar
-        cutoff_time = datetime.now(pytz.timezone("Europe/Stockholm")) - log_duration
-        log_data = [entry for entry in log_data if datetime.strptime(entry["actual_time"], "%Y-%m-%d %H:%M:%S") >= cutoff_time]
+        cutoff_time = make_aware(datetime.now()) - log_duration
+        log_data = [entry for entry in log_data if make_aware(datetime.strptime(entry["actual_time"], "%Y-%m-%d %H:%M:%S")) >= cutoff_time]
 
         write_log_data(log_data)
         create_log_html(log_data)
