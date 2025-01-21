@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Temperaturtrender vid Lindbäcksstadion</title>
+        <title>Temperatur vid Lindbäcksstadion</title>
         <style>
             body {
                 margin: 0;
@@ -45,27 +45,6 @@
             }
             .snow-temp { color: #0000FF; }
             .air-temp { color: #0000FF; }
-            .trend-arrow {
-                position: absolute;
-                font-size: 6rem;
-                color: #FFFFFF;
-                opacity: 0.5;
-                top: 50%;
-                transform: translateY(-50%);
-                z-index: -1;
-            }
-            .snow-trend-up { color: red; }
-            .snow-trend-down { color: blue; }
-            .air-trend-up { color: red; }
-            .air-trend-down { color: blue; }
-            .snow-trend {
-                left: 100%;
-                margin-left: 10px;
-            }
-            .air-trend {
-                right: 100%;
-                margin-right: 10px;
-            }
             .clock {
                 font-size: 1.2rem;
                 color: #FFFFFF;
@@ -92,12 +71,10 @@
         <div class="temperature-container">
             <div id="temperature" class="temperature">
                 <span class="snow snow-temp">Snön -8°C</span>
-                <span class="trend-arrow snow-trend snow-trend-down">↑</span>
                 <br>
                 <span class="air air-temp">Luften -8°C</span>
-                <span class="trend-arrow air-trend air-trend-down">↓</span>
             </div>
-            <div id="clock" class="clock">Senast uppdaterad: 15:48</div>
+            <div id="clock" class="clock">Senast uppdaterad: 16:08</div>
         </div>
         <div class="source">
             Kontrolldata från Temperatur.nu: 
