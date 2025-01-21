@@ -1,4 +1,4 @@
-    import requests
+import requests
 from bs4 import BeautifulSoup
 import json
 import subprocess
@@ -165,23 +165,6 @@ if response.status_code == 200:
                 text-decoration: none;
                 color: #FFFFFF;
             }}
-            table {{
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-            }}
-            th, td {{
-                padding: 10px;
-                text-align: left;
-                border-bottom: 1px solid #ddd;
-            }}
-            th {{
-                background-color: #4CAF50;
-                color: white;
-            }}
-            tr:hover {{
-                background-color: #f1f1f1;
-            }}
         </style>
     </head>
     <body>
@@ -211,8 +194,7 @@ if response.status_code == 200:
 
     # Push till GitHub
     subprocess.run(["git", "add", "index.html", log_file])
-    subprocess.run(["git", "commit", "-m", "Uppdaterad index.html och loggfil"] )
+    subprocess.run(["git", "commit", "-m", "Uppdaterad index.html och loggfil"])
     subprocess.run(["git", "push"])
-
 else:
     print(f"Kunde inte hämta data: {response.status_code}")
