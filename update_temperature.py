@@ -2,8 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import subprocess
-from datetime import datetime
-import pytz  # För att hantera tidszoner
+from datetime import datetime, timezone, timedelta
 
 url = "https://temperatur-lindbacksstadion.onrender.com/"
 data_file = "temperature_data.json"
@@ -81,6 +80,14 @@ def get_temperature_color(temperature):
     else:
         return "#FFFFFF"  # Vit
 
+# Funktion för att hämta svensk tid
+def get_swedish_time():
+    now = datetime.now()
+    if now.month in [3, 4, 5, 6, 7, 8, 9, 10]:  # Sommartid (mellan mars och oktober)
+        return datetime.now(timezone(timedelta(hours=2))).strftime("%H:%M:%S")
+    else:  # Vintertid (mellan november och februari)
+        return datetime.now(timezone(timedelta(hours=1))).strftime("%H:%M:%S")
+
 # Huvudlogik för att hämta och processa data
 response = requests.get(url)
 if response.status_code == 200:
@@ -96,10 +103,7 @@ if response.status_code == 200:
     print(f"Lufttemp: {air_temp}")
 
     # Hämtar den aktuella tiden i svensk tid (UTC +1/2, beroende på sommar/vintertid)
-    swedish_timezone = pytz.timezone('Europe/Stockholm')
-    current_time_utc = datetime.utcnow().replace(tzinfo=pytz.utc)  # UTC-tid
-    current_time_swedish = current_time_utc.astimezone(swedish_timezone)  # Konvertera till svensk tid
-    current_time = current_time_swedish.strftime("%H:%M:%S")  # Tid i formatet HH:MM:SS
+    current_time = get_swedish_time()  # Tid i formatet HH:MM:SS
 
     # Uppdatera loggfilen med svensk tid
     update_log_file(current_time, snow_temp, air_temp, updated_time)
