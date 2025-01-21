@@ -2,7 +2,7 @@ name: Update and Log Temperature
 
 on:
   schedule:
-    - cron: "*/2 * * * *" # Körs varannan minut
+    - cron: "*/1 * * * *" # Körs varje minut
   workflow_dispatch:         # Manuell körning
   push:                      # Körs vid ändringar i Python-filer
     paths:
